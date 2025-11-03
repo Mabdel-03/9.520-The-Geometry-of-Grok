@@ -1,0 +1,712 @@
+\documentclass[11pt,a4paper]{article}
+
+% Encoding & geometry
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+
+% No indents + clear paragraph spacing
+\usepackage{parskip} % removes paragraph indentation and adds vertical space between paragraphs
+
+% Fonts & micro-typography
+\usepackage{microtype}
+
+% --- Add these to your preamble (for better tables and spacing) ---
+\usepackage{tabularx}
+\usepackage{array}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% Math, figures, tables, lists
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\setlist[itemize]{topsep=2pt,itemsep=2pt,parsep=0pt}
+\setlist[enumerate]{topsep=2pt,itemsep=2pt,parsep=0pt}
+
+% Links
+\usepackage[hidelinks]{hyperref}
+\urlstyle{same}
+
+% Layout polish
+\raggedbottom
+
+\title{Grokking in Neural Networks: A Literature Review}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+This document provides a comprehensive review of research papers investigating the grokking phenomenon in neural networks. Grokking refers to delayed generalization, where models generalize long after achieving perfect training accuracy. Each section below details a specific paper, including its dataset, model architecture, training hyperparameters, and code repository.
+
+\newpage
+
+\section{Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets}
+
+\textbf{Authors:} Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, Vedant Misra
+
+\textbf{Link:} \url{https://arxiv.org/abs/2201.02177}
+
+\textbf{Summary:}
+
+This seminal paper first reported the grokking phenomenon. The authors trained small transformer models on algorithmic tasks (modular arithmetic operations) and observed that models would first overfit the training data, then suddenly generalize to perfect test accuracy after extended training, sometimes orders of magnitude more steps after memorization.
+
+The paper demonstrates grokking across multiple algorithmic tasks including modular addition, subtraction, division, and permutation composition. The key finding is that this delayed generalization occurs consistently with weight decay and appears to be a phase transition in the learning dynamics.
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item Modular addition: $(a + b) \mod p$ where $p$ is prime (e.g., $p = 97$)
+\item Modular subtraction: $(a - b) \mod p$
+\item Modular division: $a / b \mod p$
+\item Permutation composition: $S_5$ symmetric group operations
+\item Each dataset split into training (50\% or varied fractions) and test sets
+\end{itemize}
+
+\textbf{Model Architecture:}
+\begin{itemize}[noitemsep]
+\item Decoder-only Transformer
+\item 2 layers, 4 attention heads
+\item Model dimension: 128
+\item Input tokenized as: ``$\langle$lhs$\rangle$ $\langle$op$\rangle$ $\langle$rhs$\rangle$ $\langle$eq$\rangle$ $\langle$result$\rangle$ $\langle$eos$\rangle$''
+\item Token embeddings: 256-dimensional, learned
+\item Final linear layer for classification
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} AdamW
+\item \textbf{Learning rate:} $10^{-3}$
+\item \textbf{Weight decay:} 1 (critical for grokking)
+\item \textbf{Loss function:} Cross-entropy loss
+\item \textbf{Batch size:} Full batch gradient descent
+\item \textbf{Training steps:} Extended training (up to $10^5$ steps)
+\item \textbf{Initialization:} Standard PyTorch initialization
+\end{itemize}
+
+\textbf{Code Repository:}
+
+\url{https://github.com/openai/grok}
+
+\newpage
+
+\section{Towards Understanding Grokking: An Effective Theory of Representation Learning}
+
+\textbf{Authors:} Ziming Liu, Ouail Kitouni, Niklas Nolte, Eric J. Michaud, Max Tegmark, Mike Williams
+
+\textbf{Link:} \url{https://arxiv.org/abs/2205.10343}
+
+\textbf{Summary:}
+
+This paper provides a theoretical framework for understanding grokking through the lens of representation learning. The authors develop an ``effective theory'' inspired by physics that explains grokking as the emergence of structured representations in the embedding space. They identify four learning phases: comprehension, grokking, memorization, and confusion, and create phase diagrams showing how hyperparameters affect which phase occurs.
+
+The key insight is that generalization happens when models learn structured representations (e.g., embeddings arranged in geometric patterns like circles or parallelograms). The paper introduces the Representation Quality Index (RQI) to quantify structure and shows that grokking time depends critically on the ratio of training data to the size needed to determine a unique structured representation.
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item Toy model: Addition operation $(i + j)$ where $i, j \in \{0, \ldots, p-1\}$ (typically $p = 10$)
+\item Modular addition: $(a + b) \mod p$ with $p = 53$
+\item Permutation group $S_3$: 6 group elements, 36 possible samples
+\item MNIST: Reduced to 1,000 training samples (from 50,000)
+\item Training/validation splits: 45/10 for addition, 24/12 for $S_3$, 1k/9k for MNIST
+\end{itemize}
+
+\textbf{Model Architecture:}
+
+\textit{Toy Model:}
+\begin{itemize}[noitemsep]
+\item Input symbols $a, b$ mapped to trainable embeddings $E_a, E_b \in \mathbb{R}^{d_{in}}$
+\item Architecture: $(a, b) \mapsto \text{Dec}(E_a + E_b)$
+\item Decoder: MLP with architecture 1-200-200-30
+\item Both regression (MSE) and classification (cross-entropy) versions
+\end{itemize}
+
+\textit{Transformer (Modular Addition):}
+\begin{itemize}[noitemsep]
+\item Decoder-only transformer
+\item 53 integers encoded as 256D learnable embeddings
+\item Outputs concatenated and passed through linear classification layer
+\end{itemize}
+
+\textit{MNIST:}
+\begin{itemize}[noitemsep]
+\item MLP: depth-3, width-200
+\item ReLU activations
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+
+\textit{Toy Model:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer (Embeddings):} Adam
+\item \textbf{Learning rate (Embeddings):} $10^{-3}$ (fixed), varied in $[10^{-5}, 10^{-2}]$
+\item \textbf{Weight decay (Embeddings):} 0
+\item \textbf{Optimizer (Decoder):} AdamW
+\item \textbf{Learning rate (Decoder):} Varied in $[10^{-5}, 10^{-2}]$
+\item \textbf{Weight decay (Decoder):} Varied in $[0, 10]$ (regression) or $[0, 20]$ (classification)
+\item \textbf{Loss function:} MSE (regression) or Cross-entropy (classification)
+\item \textbf{Batch size:} 45
+\end{itemize}
+
+\textit{Transformer:}
+\begin{itemize}[noitemsep]
+\item \textbf{Learning rate (Embeddings):} $10^{-3}$ (fixed)
+\item \textbf{Weight decay (Embeddings):} 0
+\item \textbf{Weight decay (Decoder):} Varied
+\item \textbf{Dropout:} Explored as hyperparameter
+\end{itemize}
+
+\textit{MNIST:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} AdamW
+\item \textbf{Loss:} MSE with one-hot targets
+\item \textbf{Initialization scale:} $\times 9.0$ (Kaiming uniform)
+\end{itemize}
+
+\textbf{Code Repository:}
+
+\url{https://github.com/ejmichaud/grokking-squared}
+
+\newpage
+
+\section{Progress Measures for Grokking via Mechanistic Interpretability}
+
+\textbf{Authors:} Neel Nanda, Lawrence Chan, Tom Lieberum, Jess Smith, Jacob Steinhardt
+
+\textbf{Link:} \url{https://arxiv.org/abs/2301.05217}
+
+\textbf{Summary:}
+
+This paper reverse-engineers the algorithm learned by transformers on modular addition to understand grokking mechanistically. The authors discover that models implement a ``Fourier multiplication algorithm''—mapping inputs to circles using discrete Fourier transforms and trigonometric identities.
+
+They identify three continuous training phases: (1) memorization, where models fit training data without structure; (2) circuit formation, where the generalizing mechanism gradually forms; and (3) cleanup, where weight decay removes memorizing components. The sudden jump in test accuracy (grokking) occurs during cleanup, after the generalizing circuit has already formed. This shows grokking is not a sudden discovery but gradual amplification of structured mechanisms.
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item Modular addition: $(a + b) \mod P$ where $P = 113$ (prime)
+\item Input format: ``a b ='' where $a, b$ are $P$-dimensional one-hot vectors
+\item Training data: 30\% of all possible pairs ($113 \times 113$)
+\item Test data: All remaining pairs
+\item Additional robustness checks with different primes and data fractions in appendices
+\end{itemize}
+
+\textbf{Model Architecture:}
+\begin{itemize}[noitemsep]
+\item One-layer ReLU Transformer
+\item Model dimension $d = 128$
+\item 4 attention heads, dimension $d/4 = 32$ each
+\item Token embeddings: 128-dimensional, learned
+\item Learned positional embeddings
+\item MLP hidden units: $n = 512$
+\item No LayerNorm
+\item Embedding and unembedding matrices not tied
+\item Output read from position above ``='' token
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} AdamW
+\item \textbf{Learning rate ($\gamma$):} $0.001$
+\item \textbf{Weight decay ($\lambda$):} $1$
+\item \textbf{Loss function:} Cross-entropy (implied from classification task)
+\item \textbf{Batch size:} Full batch gradient descent
+\item \textbf{Training epochs:} 40{,}000
+\item \textbf{Initialization:} Standard PyTorch initialization
+\end{itemize}
+
+\textbf{Code Repository:}
+
+\url{https://neelnanda.io/grokking-paper}
+
+\newpage
+
+\section{Grokked Transformers are Implicit Reasoners: A Mechanistic Journey to the Edge of Generalization}
+
+\textbf{Authors:} Boshi Wang, Xiang Yue, Yu Su, Huan Sun
+
+\textbf{Link:} \url{https://arxiv.org/abs/2405.15071}
+
+\textbf{Summary:}
+
+This paper investigates whether transformers can learn implicit reasoning over parametric knowledge through grokking. The authors study two reasoning types: composition (multi-hop reasoning like ``Barack's wife was born in 1964'') and comparison (comparing attributes). They find transformers consistently grok both tasks, but with different systematicity: composition fails on out-of-distribution (OOD) examples while comparison succeeds.
+
+Through mechanistic analysis, they discover that grokking occurs via different circuit configurations. The key finding is that transformers develop different ``generalizing circuits'' for different tasks, and systematicity depends on whether atomic knowledge is stored in shared vs. separate layers. This provides insights into why transformers struggle with certain compositional reasoning tasks.
+
+\textbf{Datasets Used:}
+
+\textit{Composition Task:}
+\begin{itemize}[noitemsep]
+\item Knowledge graph with $|E|$ entities and $|R| = 200$ relations
+\item Each entity has 20 random relations to other entities
+\item Atomic facts partitioned: 95\% in-distribution (ID), 5\% out-of-distribution (OOD)
+\item Two-hop composition rule: $(h, r_1, b) \wedge (b, r_2, t) \Rightarrow (h, r_1, r_2, t)$
+\item Varied $|E| \in \{2000, 5000, 10000\}$
+\item Ratio $\phi = |\text{inferred facts}|/|\text{atomic facts}|$ varied in $\{3.6, 5.4, 7.2, 9.0, 12.6, 18.0\}$
+\end{itemize}
+
+\textit{Comparison Task:}
+\begin{itemize}[noitemsep]
+\item $|E| = 1000$ entities, $|A| = 20$ attributes, $|V| = 20$ ordinal values
+\item Each (entity, attribute) pair assigned random value
+\item Atomic facts: (entity, attribute, value) triplets
+\item 90\% ID, 10\% OOD split
+\item Comparison rules for $<, =, >$ relations
+\end{itemize}
+
+\textit{Complex Reasoning Task:}
+\begin{itemize}[noitemsep]
+\item Uses transitivity and symmetry rules
+\item Average 50+ facts per query entity
+\item Ground truth proofs involve 2 ID bridge entities
+\item 28.2K facts on average (full context), 5.4K with retrieval
+\end{itemize}
+
+\textbf{Model Architecture:}
+\begin{itemize}[noitemsep]
+\item Standard decoder-only transformer (GPT-2 style)
+\item 8 layers, 768 hidden dimensions, 12 attention heads
+\item Each unique token assigned unique identifier
+\item Larger models explored: 24 layers/1024 dim, 36 layers/1280 dim (Appendix B)
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} AdamW
+\item \textbf{Learning rate:} $10^{-4}$
+\item \textbf{Batch size:} 512
+\item \textbf{Weight decay:} 0.1 (also tested 0.03 and 0.3)
+\item \textbf{Warm-up steps:} 2000
+\item \textbf{Loss function:} Not explicitly stated (likely cross-entropy)
+\item \textbf{Training steps:} Up to $2 \times 10^6$ steps
+\end{itemize}
+
+\textbf{Code Repository:}
+
+\url{https://github.com/OSU-NLP-Group/GrokkedTransformer}
+
+\newpage
+
+\section{Omnigrok: Grokking Beyond Algorithmic Data}
+
+\textbf{Authors:} Ziming Liu, Eric J. Michaud, Max Tegmark
+
+\textbf{Link:} \url{https://arxiv.org/abs/2210.01117}
+
+\textbf{Summary:}
+
+This paper extends grokking beyond algorithmic datasets to more realistic data including images (MNIST), text (IMDb), and molecules (QM9). The authors attribute grokking to the ``LU mechanism''—a mismatch between training and test loss landscapes. Training loss resembles an ``L'' shape against weight norm while test loss resembles a ``U'' shape.
+
+The paper shows that grokking is more dramatic for algorithmic datasets due to representation learning requirements, and can be nearly eliminated through proper weight norm constraints. They demonstrate that grokking is a common phenomenon across diverse domains, not specific to modular arithmetic.
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item \textbf{Algorithmic:} Modular addition $(n_1 + n_2) \mod p$, typically $p = 113$
+\item \textbf{MNIST:} Training subset reduced from 60k to 1k samples
+\item \textbf{IMDb:} Movie review sentiment analysis, reduced to 1k training samples
+\item \textbf{QM9:} Molecular property prediction (isotropic polarizability), 100--3000 training samples
+\item All datasets use small training sizes to induce grokking
+\end{itemize}
+
+\textbf{Model Architecture:}
+
+\textit{MNIST:}
+\begin{itemize}[noitemsep]
+\item MLP: depth-3, width-200
+\item ReLU activations
+\end{itemize}
+
+\textit{IMDb:}
+\begin{itemize}[noitemsep]
+\item LSTM with 2 layers
+\item Embedding dimension: 64
+\item Hidden dimension: 128
+\end{itemize}
+
+\textit{QM9:}
+\begin{itemize}[noitemsep]
+\item Graph Convolutional Neural Network (GCNN)
+\item 2 convolutional layers with ReLU activation
+\item Followed by linear layer
+\end{itemize}
+
+\textit{Modular Addition (Transformer):}
+\begin{itemize}[noitemsep]
+\item 1-layer transformer, $d_{\text{model}} = 128$
+\item 4 attention heads, $d_{\text{mlp}} = 512$
+\item ReLU activations
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} Adam (all experiments)
+\item \textbf{Learning rate:} $0.001$ (MNIST), $0.005$ (modular addition)
+\item \textbf{Weight decay:} 0 for all except MNIST ($0.01$) and transformer (1)
+\item \textbf{Loss function:} MSE (MNIST, QM9), Binary cross-entropy (IMDb), Cross-entropy (algorithmic)
+\item \textbf{Batch size:} 200 (MNIST), varies for others
+\item \textbf{Initialization:} Standard, or scaled by factor $\alpha = w/w_0$ to induce grokking
+\item \textbf{Local complexity parameter:} $r = 0.005$ (CNN), $r = 10^{-4}$ (ResNet18), $P = 25$ dimensions
+\end{itemize}
+
+\textbf{Code Repository:}
+
+\url{https://github.com/KindXiaoming/Omnigrok}
+
+\newpage
+
+\section{Deep Networks Always Grok and Here is Why}
+
+\textbf{Authors:} Ahmed Imtiaz Humayun, Randall Balestriero, Richard Baraniuk
+
+\textbf{Link:} \url{https://arxiv.org/abs/2402.15555}
+
+\textbf{Summary:}
+
+This paper demonstrates that grokking is widespread and occurs in practical settings, not just controlled algorithmic tasks. The authors introduce ``delayed robustness''—where DNNs grok adversarial examples long after generalizing on clean test data. They explain grokking through ``local complexity'' of the DNN's spline partition, showing that networks undergo a phase transition where linear regions migrate away from training points toward decision boundaries.
+
+The key finding is that grokking results from the emergence of a robust input space partition through linearization around training points. This happens in three phases: initial descent, ascent (complexity accumulation), and second descent (region migration).
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item \textbf{MNIST:} 1{,}000 training samples
+\item \textbf{CIFAR10:} Standard dataset, also tested with batch normalization variants
+\item \textbf{CIFAR100:} Standard dataset
+\item \textbf{Imagenette:} Subset of ImageNet with 10 classes
+\item \textbf{Shakespeare Text:} Character-level next token prediction
+\item Adversarial examples via $\ell_\infty$-PGD with $\epsilon \in \{0.03, 0.06, 0.10, 0.13, 0.16, 0.20\}$, $\alpha = 0.0156$, 10--100 PGD steps
+\end{itemize}
+
+\textbf{Model Architecture:}
+
+\textit{MNIST:}
+\begin{itemize}[noitemsep]
+\item 4-layer ReLU MLP, width 200
+\item Varying depths (2--6) and widths (20--2000) in ablations
+\end{itemize}
+
+\textit{CIFAR10/CIFAR100:}
+\begin{itemize}[noitemsep]
+\item CNN with 5 convolutional layers, 2 linear layers
+\item ResNet18 (pre-activation, width 16, no batch normalization)
+\end{itemize}
+
+\textit{Imagenette:}
+\begin{itemize}[noitemsep]
+\item Standard ResNet18 from \texttt{torchvision}
+\end{itemize}
+
+\textit{Shakespeare Text (GPT):}
+\begin{itemize}[noitemsep]
+\item 12 layers, 12 attention heads
+\item Character-level tokenization
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} Adam (all experiments)
+\item \textbf{Learning rate:} $0.001$ (most experiments)
+\item \textbf{Weight decay:} 0 (most), $0.01$ (MNIST-MLP)
+\item \textbf{Loss function:} Cross-entropy (classification), MSE (some MNIST experiments)
+\item \textbf{Batch size:} 200 (MNIST), 64--512 (CIFAR10), varies for others
+\item \textbf{Initialization:} Kaiming uniform (default PyTorch), or scaled by factor $\alpha$
+\item \textbf{Training steps:} Extended ($10^5$ steps typical)
+\end{itemize}
+
+\textbf{Code Repository:}
+
+\url{https://bit.ly/grok-adversarial}
+
+\newpage
+
+\section{The Slingshot Mechanism: An Empirical Study of Adaptive Optimizers and the Grokking Phenomenon}
+
+\textbf{Authors:} Vimal Thilak, Etai Littwin, Shuangfei Zhai, Omid Saremi, Roni Paiss, Joshua M. Susskind
+
+\textbf{Link:} \url{https://arxiv.org/abs/2206.04817}
+
+\textbf{Summary:}
+
+This paper identifies an optimization anomaly in adaptive optimizers (specifically Adam family) during late-stage training, dubbed the ``Slingshot Mechanism.'' The authors observe cyclic phase transitions between stable and unstable training regimes, evidenced by cyclic behavior in the norm of the last layer's weights. Grokking occurs predominantly at the onset of these Slingshot effects.
+
+The key finding is that without explicit regularization, grokking happens almost exclusively during Slingshots, suggesting an implicit regularization effect from the optimization dynamics themselves. This provides evidence that grokking is tied to specific properties of adaptive gradient methods rather than just weight decay.
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item Modular addition: $(a + b) \mod p$ for various primes $p$
+\item Modular division and other algorithmic operations
+\item Various dataset fractions to study data dependence
+\end{itemize}
+
+\textbf{Model Architecture:}
+\begin{itemize}[noitemsep]
+\item Transformers (decoder-only)
+\item MLPs with varying depths and widths
+\item Specific architectures varied to show generality
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} Adam, AdamW (focus on Adam family)
+\item \textbf{Learning rate:} $10^{-3}$ to $10^{-4}$
+\item \textbf{Weight decay:} Varied, including $0$
+\item \textbf{Loss function:} Cross-entropy
+\item \textbf{Batch size:} Full batch gradient descent in many experiments
+\item \textbf{Training:} Extended beyond overfitting to observe Slingshot cycles
+\end{itemize}
+
+\textbf{Code Repository:}
+
+Not explicitly provided in the paper, but the phenomenon is reproducible with standard implementations.
+
+\newpage
+
+\section{Grokking Modular Polynomials}
+
+\textbf{Authors:} Darshil Doshi, Tianyu He, Aritra Das, Andrey Gromov
+
+\textbf{Link:} \url{https://arxiv.org/abs/2406.03495}
+
+\textbf{Summary:}
+
+This paper extends analytical solutions for grokking to modular multiplication and modular addition with multiple terms. The authors construct ``expert'' networks that can solve arbitrary modular polynomials by combining solutions for elementary operations. They propose a classification of modular polynomials into learnable and non-learnable based on whether they can be expressed in the form $h(g_1(n_1) + g_2(n_2)) \mod p$.
+
+The key contribution is providing exact analytical solutions for network weights that achieve perfect generalization, and showing that trained networks learn similar solutions through grokking.
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item Modular addition with multiple terms: $(c_1n_1 + c_2n_2 + \cdots + c_Sn_S) \mod p$
+\item Modular multiplication: $(n_1^a n_2^b) \mod p$ where $a, b \in \mathbb{Z}_p \setminus \{0\}$
+\item General modular polynomials: $(c_1n_1^{a_1}n_2^{b_1} + c_2n_1^{a_2}n_2^{b_2} + \cdots) \mod p$
+\item Primes used: $p = 11, 23, 97$
+\item 50\% training / 50\% test split typically
+\end{itemize}
+
+\textbf{Model Architecture:}
+\begin{itemize}[noitemsep]
+\item 2-layer MLP with power activation function $\phi(x) = x^S$
+\item Width $N$ varied (500, 2000, 5000 in experiments)
+\item Input: one-hot encoded numbers
+\item First layer: embedding matrices $U^{(1)}, \ldots, U^{(S)} \in \mathbb{R}^{N \times p}$
+\item Second layer: output matrix $W \in \mathbb{R}^{p \times N}$
+\item For multiplication: similar architecture with exponential/logarithmic maps in finite fields
+\item Output: $f(e_{n_1} \oplus \cdots \oplus e_{n_S}) = W\phi(U^{(1)}e_{n_1} + \cdots + U^{(S)}e_{n_S})$
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} Adam
+\item \textbf{Learning rate:} $0.005$
+\item \textbf{Weight decay:} $5.0$
+\item \textbf{Loss function:} MSE loss
+\item \textbf{Batch size:} Not explicitly stated
+\item \textbf{Training:} Extended until grokking observed
+\item \textbf{Network width:} $N = 500$ (multiplication), $N = 5000$ (addition with many terms)
+\end{itemize}
+
+\textbf{Code Repository:}
+
+Not explicitly provided in the paper abstract/introduction, but analytical solutions are detailed.
+
+\newpage
+
+\section{Grokking in Linear Estimators: A Solvable Model that Groks without Understanding}
+
+\textbf{Authors:} Noam Levi, Alon Beck, Yohai Bar-Sinai
+
+\textbf{Link:} \url{https://arxiv.org/abs/2310.16441}
+
+\textbf{Summary:}
+
+This paper demonstrates that grokking can occur even in simple linear networks performing linear tasks in a teacher-student setup with Gaussian inputs. The authors derive exact analytical solutions for training dynamics in terms of covariance matrices, providing closed-form predictions for grokking time dependence on various factors.
+
+The key insight is that grokking in this setting doesn't represent ``understanding'' but is simply an artifact of the accuracy metric. The sharp increase in accuracy occurs when generalization loss drops below a fixed threshold, while the loss decreases smoothly. This challenges interpretations of grokking as a transition from memorization to understanding.
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item Synthetic Gaussian data: $x_i \sim \mathcal{N}(0, I_{d_{in} \times d_{in}})$
+\item Teacher model generates labels: $y_i = T^T x_i$ where $T \in \mathbb{R}^{d_{in} \times d_{out}}$
+\item Training samples: $N_{tr}$ varied
+\item Test samples: $N_{gen}$ independent samples
+\item Input dimension $d_{in}$ and output dimension $d_{out}$ varied
+\item Regime: $d_{in}, N_{tr} \to \infty$ with $\lambda = d_{in}/N_{tr}$ constant
+\end{itemize}
+
+\textbf{Model Architecture:}
+\begin{itemize}[noitemsep]
+\item \textbf{1-layer linear network:} Student matrix $S \in \mathbb{R}^{d_{in} \times d_{out}}$, no biases
+\item \textbf{2-layer linear network:} $S = S_0 S_1$ with $S_0 \in \mathbb{R}^{d_{in} \times d_h}$, $S_1 \in \mathbb{R}^{d_h \times d_{out}}$
+\item \textbf{2-layer with nonlinearity:} Same as above with $\tanh$ activation (tested empirically)
+\item Initialization: $S_0, T \sim \mathcal{N}(0, 1/(2d_{in}d_{out}))$ for 1-layer, similar for 2-layer
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} Full batch gradient descent (GD) in gradient flow limit
+\item \textbf{Learning rate:} $\eta = \eta_0\,dt$ where $\eta_0$ typically $0.01$, $dt \to 0$
+\item \textbf{Weight decay ($\gamma$):} $[10^{-5}, 1]$
+\item \textbf{Loss function:} MSE: $\mathcal{L} = \frac{1}{N_{tr}d_{out}}\sum_i \|(S-T)^T x_i\|^2$
+\item \textbf{Classification threshold:} $\epsilon$ (sample correct if error $< \epsilon$), typically $10^{-3}$ or $10^{-6}$
+\item \textbf{Accuracy definition:} $A = \mathrm{Erf}\!\big(\sqrt{\epsilon/(2L)}\big)$ where $L$ is loss
+\item \textbf{Training:} Up to $10^5$ epochs
+\item Settings: $d_{in} = 10^3$, $d_{out} = 1$ (main), also $d_{out} \in \{1, 50, 700\}$, $\lambda \in \{0.1, 0.5, 0.9, 1.5\}$
+\end{itemize}
+
+\textbf{Code Repository:}
+
+Not explicitly provided in the abstract, but mathematical derivations are fully specified.
+
+\newpage
+
+\section{Grokking Tickets: Lottery Tickets Accelerate Grokking}
+
+\textbf{Authors:} Gouki Minegishi, Yusuke Iwasawa, Yutaka Matsuo
+
+\textbf{Link:} \url{https://arxiv.org/abs/2310.19470}
+
+\textbf{Summary:}
+
+This paper connects grokking with the Lottery Ticket Hypothesis, identifying ``Grokking tickets'' as sparse subnetworks discovered through magnitude pruning after perfect generalization. These subnetworks drastically accelerate grokking compared to dense networks. The authors show that weight norm alone doesn't explain grokking—the specific structure of good subnetworks is critical.
+
+The key finding is that at appropriate pruning rates, grokking can be achieved even without weight decay. Subnetworks identified at generalization accelerate grokking, while those from memorization or initialization do not, indicating gradual discovery of good subnetworks during training.
+
+\textbf{Datasets Used:}
+\begin{itemize}[noitemsep]
+\item Modular addition: $(a + b) \mod p$
+\item Image classification: MNIST
+\item Various data fractions to study effect on grokking
+\end{itemize}
+
+\textbf{Model Architecture:}
+\begin{itemize}[noitemsep]
+\item \textbf{MLP:} Depth and width varied
+\item \textbf{Transformer:} Decoder-only, similar to baseline grokking papers
+\item Magnitude pruning at various stages: initialization, memorization (2k steps), transition (10--16k steps), generalization (28k steps)
+\item Pruning rate: typically 0.6 (60\% weights pruned), global across layers
+\end{itemize}
+
+\textbf{Training Hyperparameters:}
+\begin{itemize}[noitemsep]
+\item \textbf{Optimizer:} Adam/AdamW
+\item \textbf{Learning rate:} Similar to baseline grokking experiments
+\item \textbf{Weight decay:} Varied, including $0$
+\item \textbf{Loss function:} Cross-entropy
+\item \textbf{Training procedure:}
+  \begin{itemize}
+  \item Train full network until generalization
+  \item Apply magnitude pruning (keep weights with highest $|w|$)
+  \item Reinitialize pruned network and retrain
+  \item Compare grokking time to dense baseline
+  \end{itemize}
+\item Controlled experiments matching L1/L2 norms between sparse and dense networks
+\end{itemize}
+
+\textbf{Code Repository:}
+
+\url{https://github.com/gouki510/Grokking-Tickets}
+
+\newpage
+
+\section{Additional Papers}
+
+Due to the comprehensive nature of the above papers, we have documented 10 major papers on grokking. Additional notable papers include:
+
+\begin{itemize}
+\item \textbf{Barak et al.} ``Hidden Progress in Deep Learning: SGD Learns Parities Near the Computational Limit'' — Introduces progress measures concept
+\item \textbf{Davies et al.} ``Unifying Grokking and Double Descent'' — Connects grokking with double descent phenomenon
+\item \textbf{Kumar et al.} ``Grokking as the Transition from Lazy to Rich Training Dynamics'' — Explains grokking via lazy vs.\ feature learning regimes
+\end{itemize}
+
+\section{Summary}
+
+This review covers the major papers investigating grokking across algorithmic tasks, image classification, language modeling, and theoretical settings. Key themes include:
+
+\begin{enumerate}
+\item \textbf{Representation learning:} Structured representations (circles, parallelograms) emerge during grokking
+\item \textbf{Weight decay:} Critical regularization mechanism driving transition from memorization to generalization
+\item \textbf{Phase transitions:} Training exhibits distinct phases (memorization, circuit formation, cleanup)
+\item \textbf{Mechanistic understanding:} Fourier-based algorithms and trigonometric identities learned implicitly
+\item \textbf{Universality:} Grokking occurs beyond algorithmic datasets, including images and natural language
+\item \textbf{Optimization dynamics:} Slingshot mechanism and lottery ticket connections
+\item \textbf{Theoretical foundations:} Exact solutions possible in linear settings; effective theories explain dynamics
+\end{enumerate}
+
+\newpage
+% --- Replace your existing summary table section with this one ---
+\section{Summary Table of Grokking Papers}
+
+\begin{table}[h!]
+\centering
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabularx}{\textwidth}{@{}L L L L@{}}
+\toprule
+\textbf{Paper} & \textbf{Primary Datasets} & \textbf{Model Architecture} & \textbf{Code (GitHub/URL)} \\
+\midrule
+
+\textit{\href{https://arxiv.org/abs/2201.02177}{Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets}} (Power et al., 2022)
+& Modular arithmetic (addition, subtraction, division), permutation composition
+& 2-layer decoder-only Transformer (4 heads, $d_{\mathrm{model}}{=}128$)
+& \url{https://github.com/openai/grok} \\
+
+\textit{\href{https://arxiv.org/abs/2205.10343}{Towards Understanding Grokking: An Effective Theory of Representation Learning}} (Liu et al., 2022)
+& Modular addition; $S_3$ permutation; MNIST (1k subset)
+& Toy MLP (1–200–200–30), Transformer, MLP (ReLU)
+& \url{https://github.com/ejmichaud/grokking-squared} \\
+
+\textit{\href{https://arxiv.org/abs/2301.05217}{Progress Measures for Grokking via Mechanistic Interpretability}} (Nanda et al., 2023)
+& Modular addition $(a{+}b)\bmod 113$
+& 1-layer ReLU Transformer ($d{=}128$, 4 heads)
+& \url{https://neelnanda.io/grokking-paper} \\
+
+\textit{\href{https://arxiv.org/abs/2405.15071}{Grokked Transformers are Implicit Reasoners}} (Wang et al., 2024)
+& KG reasoning (composition \& comparison tasks)
+& GPT-2–style Transformer (8 layers, 12 heads, $d{=}768$)
+& \url{https://github.com/OSU-NLP-Group/GrokkedTransformer} \\
+
+\textit{\href{https://arxiv.org/abs/2210.01117}{Omnigrok: Grokking Beyond Algorithmic Data}} (Liu et al., 2022)
+& Modular addition; MNIST; IMDb; QM9
+& MLP; LSTM; GCNN; 1-layer Transformer
+& \url{https://github.com/KindXiaoming/Omnigrok} \\
+
+\textit{\href{https://arxiv.org/abs/2402.15555}{Deep Networks Always Grok and Here is Why}} (Humayun et al., 2024)
+& MNIST; CIFAR-10/100; Imagenette; Shakespeare text
+& MLP; CNN; ResNet-18; GPT (12 layers)
+& \url{https://bit.ly/grok-adversarial} \\
+
+\textit{\href{https://arxiv.org/abs/2206.04817}{The Slingshot Mechanism: An Empirical Study of Adaptive Optimizers and the Grokking Phenomenon}} (Thilak et al., 2022)
+& Modular addition/division; other algorithmic datasets
+& Transformer; MLP (varied)
+& \textit{Not provided} \\
+
+\textit{\href{https://arxiv.org/abs/2406.03495}{Grokking Modular Polynomials}} (Doshi et al., 2024)
+& Modular polynomials; addition/multiplication $(\bmod\ p)$
+& 2-layer MLP with power activation $\phi(x)=x^S$
+& \textit{Not provided} \\
+
+\textit{\href{https://arxiv.org/abs/2310.16441}{Grokking in Linear Estimators: A Solvable Model that Groks without Understanding}} (Levi et al., 2023)
+& Synthetic Gaussian (teacher–student)
+& Linear networks (1- and 2-layer)
+& \textit{Not provided} \\
+
+\textit{\href{https://arxiv.org/abs/2310.19470}{Grokking Tickets: Lottery Tickets Accelerate Grokking}} (Minegishi et al., 2023)
+& Modular addition; MNIST
+& MLP; decoder-only Transformer
+& \url{https://github.com/gouki510/Grokking-Tickets} \\
+
+\bottomrule
+\end{tabularx}
+\caption{Mapping of grokking-related papers to datasets, architectures, and code repositories. Hyperlinks point to the corresponding arXiv entries.}
+\label{tab:grokking-map}
+\end{table}
+
+
+
+
+\end{document}
