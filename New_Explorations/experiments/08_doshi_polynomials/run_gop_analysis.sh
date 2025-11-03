@@ -4,14 +4,11 @@
 #SBATCH --error=logs/gop_polynomials_%j.err
 #SBATCH --time=48:00:00
 #SBATCH --mem=64G
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=8
 
 # GOP Analysis for Modular Polynomials
 mkdir -p logs
-
-# Load CUDA module
-module load cuda/11.8
 
 # Activate conda environment
 source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh

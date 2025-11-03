@@ -4,16 +4,13 @@
 #SBATCH --error=logs/linear_1layer_%j.err
 #SBATCH --time=12:00:00
 #SBATCH --mem=8G
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=2
 
 # Grokking in Linear Estimators
 # Levi et al. (2023)
 
 mkdir -p logs checkpoints
-
-# Load CUDA module
-module load cuda/11.8
 
 # Activate conda environment
 source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh

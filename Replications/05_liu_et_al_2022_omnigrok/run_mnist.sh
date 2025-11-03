@@ -4,7 +4,7 @@
 #SBATCH --error=logs/mnist_%j.err
 #SBATCH --time=24:00:00
 #SBATCH --mem=16G
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=4
 
 # Omnigrok: Grokking Beyond Algorithmic Data
@@ -12,14 +12,11 @@
 
 mkdir -p logs
 
-# Load modules
-module load python/3.9
-module load cuda/11.8
+# Activate conda environment
+source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
+conda activate /om2/user/mabdel03/conda_envs/SLT_Proj_Env
 
 cd $SLURM_SUBMIT_DIR
-
-# Install dependencies
-pip install torch torchvision numpy matplotlib jupyter --quiet
 
 # Run MNIST grokking experiment
 # Uses reduced training set (1k samples) to induce grokking

@@ -4,7 +4,7 @@
 #SBATCH --error=logs/gop_nanda_%j.err
 #SBATCH --time=48:00:00
 #SBATCH --mem=64G
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=8
 
 # GOP Analysis for Nanda et al. (2023)
@@ -13,12 +13,9 @@
 # Create logs directory
 mkdir -p logs
 
-# Load modules (adjust for your HPC)
-module load python/3.9
-module load cuda/11.8
-
-# Activate environment if needed
-# source /path/to/venv/bin/activate
+# Activate conda environment
+source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
+conda activate /om2/user/mabdel03/conda_envs/SLT_Proj_Env
 
 # Navigate to experiment directory
 cd $SLURM_SUBMIT_DIR

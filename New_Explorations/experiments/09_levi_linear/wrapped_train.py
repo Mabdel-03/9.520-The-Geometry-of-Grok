@@ -11,8 +11,8 @@ import torch.optim as optim
 import argparse
 import logging
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "framework"))
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "Replications/09_levi_et_al_2023_linear_estimators"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "Replications" / "09_levi_et_al_2023_linear_estimators"))
 
 from framework import TrainingWrapper, HDF5Storage, ExperimentConfig
 from model import TeacherStudentDataset, get_student_model, compute_accuracy
