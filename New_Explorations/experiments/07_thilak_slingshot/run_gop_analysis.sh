@@ -9,7 +9,14 @@
 
 # GOP Analysis for Slingshot Mechanism
 mkdir -p logs
-module load python/3.9 cuda/11.8
+
+# Load CUDA module
+module load cuda/11.8
+
+# Activate conda environment
+source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
+conda activate /om2/user/mabdel03/conda_envs/SLT_Proj_Env
+
 cd $SLURM_SUBMIT_DIR
 
 python wrapped_train.py --config ../../configs/07_thilak_slingshot.yaml
