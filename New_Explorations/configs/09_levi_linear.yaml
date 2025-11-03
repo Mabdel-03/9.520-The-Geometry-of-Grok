@@ -1,0 +1,49 @@
+# GOP Analysis Configuration for Levi et al. (2023) - Linear Estimators
+
+experiment:
+  name: "levi_linear_estimators"
+  paper_id: "09"
+  description: "GOP analysis of linear teacher-student framework"
+
+model:
+  path: "../../Replications/09_levi_et_al_2023_linear_estimators"
+  type: "linear"
+  params_estimate: 1000  # d_in * d_out = 1000 * 1
+
+training:
+  epochs: 100000
+  device: "cuda"
+  log_interval: 100
+  
+  # Model hyperparameters
+  architecture: "1layer"
+  d_in: 1000
+  d_out: 1
+  d_h: 500
+  n_train: 500
+  n_test: 10000
+  lr: 0.01
+  weight_decay: 0.01
+  accuracy_threshold: 0.001
+
+gop_tracking:
+  enabled: true
+  compute_full: true
+  compute_per_layer: true
+  frequency: 1
+  top_k_eigen: 100
+  rank_threshold: 1.0e-6
+  use_gpu: true
+  store_eigenvectors: true
+
+storage:
+  output_dir: "./results/09_levi_linear"
+  compression: "gzip"
+  compression_level: 6
+  store_full_gop: true
+  float_precision: "float32"
+
+computational_limits:
+  max_gop_size_gb: 10  # Much smaller for linear model
+  checkpoint_frequency: 1000
+

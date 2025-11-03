@@ -1,0 +1,48 @@
+# GOP Analysis Configuration for Doshi et al. (2024) - Modular Polynomials
+
+experiment:
+  name: "doshi_modular_polynomials"
+  paper_id: "08"
+  description: "GOP analysis of 2-layer MLP with power activation"
+
+model:
+  path: "../../Replications/08_doshi_et_al_2024_modular_polynomials"
+  type: "mlp_power"
+  params_estimate: 50000  # ~50K parameters for p=97, hidden=500
+
+training:
+  epochs: 50000
+  device: "cuda"
+  log_interval: 100
+  
+  # Model hyperparameters
+  task: "addition"
+  p: 97
+  num_terms: 2
+  hidden_dim: 500
+  power: 2
+  train_fraction: 0.5
+  lr: 0.005
+  weight_decay: 5.0
+
+gop_tracking:
+  enabled: true
+  compute_full: true
+  compute_per_layer: true
+  frequency: 1
+  top_k_eigen: 100
+  rank_threshold: 1.0e-6
+  use_gpu: true
+  store_eigenvectors: true
+
+storage:
+  output_dir: "./results/08_doshi_polynomials"
+  compression: "gzip"
+  compression_level: 6
+  store_full_gop: true
+  float_precision: "float32"
+
+computational_limits:
+  max_gop_size_gb: 50
+  checkpoint_frequency: 1000
+

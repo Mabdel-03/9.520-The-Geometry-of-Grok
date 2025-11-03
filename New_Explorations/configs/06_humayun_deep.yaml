@@ -1,0 +1,46 @@
+# GOP Analysis Configuration for Humayun et al. (2024) - Deep Networks Always Grok
+
+experiment:
+  name: "humayun_mnist_mlp"
+  paper_id: "06"
+  description: "GOP analysis of MLP on MNIST showing delayed robustness"
+
+model:
+  path: "../../Replications/06_humayun_et_al_2024_deep_networks"
+  type: "mlp"
+  params_estimate: 160000  # ~160K for 4-layer width-200 MLP
+
+training:
+  epochs: 100000
+  device: "cuda"
+  log_interval: 100
+  
+  # Model and training hyperparameters
+  model_name: "mlp"
+  dataset: "mnist"
+  train_size: 1000  # Reduced to induce grokking
+  batch_size: 200
+  lr: 0.001
+  weight_decay: 0.01
+
+gop_tracking:
+  enabled: true
+  compute_full: true
+  compute_per_layer: true
+  frequency: 1
+  top_k_eigen: 100
+  rank_threshold: 1.0e-6
+  use_gpu: true
+  store_eigenvectors: true
+
+storage:
+  output_dir: "./results/06_humayun_mnist"
+  compression: "gzip"
+  compression_level: 6
+  store_full_gop: true
+  float_precision: "float32"
+
+computational_limits:
+  max_gop_size_gb: 150
+  checkpoint_frequency: 1000
+
