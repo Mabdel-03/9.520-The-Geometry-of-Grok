@@ -1,0 +1,50 @@
+# GOP Analysis Configuration for Nanda et al. (2023) - Progress Measures
+# 1-layer ReLU Transformer on Modular Addition
+
+experiment:
+  name: "nanda_progress_modular_addition"
+  paper_id: "03"
+  description: "GOP analysis of 1-layer ReLU Transformer (Nanda et al. 2023)"
+
+model:
+  path: "../../Replications/03_nanda_et_al_2023_progress_measures"
+  type: "transformer"
+  params_estimate: 100000  # ~100K parameters
+
+training:
+  epochs: 40000
+  batch_size: "full"  # Full batch gradient descent
+  device: "cuda"
+  log_interval: 100
+  
+  # Model hyperparameters
+  p: 113  # Modulus
+  train_fraction: 0.3
+  d_model: 128
+  n_heads: 4
+  d_mlp: 512
+  lr: 0.001
+  weight_decay: 1.0
+
+gop_tracking:
+  enabled: true
+  compute_full: true
+  compute_per_layer: true
+  frequency: 1  # Track every epoch
+  top_k_eigen: 100
+  rank_threshold: 1.0e-6
+  use_gpu: true
+  store_eigenvectors: true
+
+storage:
+  output_dir: "./results/03_nanda_progress"
+  compression: "gzip"
+  compression_level: 6
+  store_full_gop: true
+  float_precision: "float32"
+
+computational_limits:
+  max_gop_size_gb: 100
+  checkpoint_frequency: 1000  # Save intermediate results every N epochs
+  warn_if_exceeds_gb: 50
+

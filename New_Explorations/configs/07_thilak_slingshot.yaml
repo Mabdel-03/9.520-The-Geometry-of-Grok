@@ -1,0 +1,49 @@
+# GOP Analysis Configuration for Thilak et al. (2022) - Slingshot Mechanism
+
+experiment:
+  name: "thilak_slingshot_modular_addition"
+  paper_id: "07"
+  description: "GOP analysis of Slingshot Mechanism with Adam optimizer dynamics"
+
+model:
+  path: "../../Replications/07_thilak_et_al_2022_slingshot"
+  type: "transformer"
+  params_estimate: 150000
+
+training:
+  epochs: 50000
+  device: "cuda"
+  log_interval: 50
+  
+  # Model hyperparameters
+  p: 97
+  train_fraction: 0.5
+  d_model: 128
+  n_heads: 4
+  n_layers: 2
+  d_mlp: 512
+  optimizer: "adam"
+  lr: 0.001
+  weight_decay: 0.0  # Slingshot without weight decay
+
+gop_tracking:
+  enabled: true
+  compute_full: true
+  compute_per_layer: true
+  frequency: 1
+  top_k_eigen: 100
+  rank_threshold: 1.0e-6
+  use_gpu: true
+  store_eigenvectors: true
+
+storage:
+  output_dir: "./results/07_thilak_slingshot"
+  compression: "gzip"
+  compression_level: 6
+  store_full_gop: true
+  float_precision: "float32"
+
+computational_limits:
+  max_gop_size_gb: 100
+  checkpoint_frequency: 1000
+

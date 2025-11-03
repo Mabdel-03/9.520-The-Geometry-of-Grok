@@ -1,0 +1,52 @@
+# Configuration Template for GOP Analysis
+# Copy and adapt this for new experiments
+
+experiment:
+  name: "experiment_name_here"
+  paper_id: "XX"
+  description: "Brief description of the experiment"
+
+model:
+  path: "../../Replications/XX_paper_directory"
+  type: "transformer|mlp|cnn|linear"  # Model architecture type
+  params_estimate: 100000  # Estimated number of parameters
+
+training:
+  epochs: 40000           # Total training epochs
+  device: "cuda"          # "cuda" or "cpu"
+  log_interval: 100       # How often to log and evaluate
+  
+  # Paper-specific hyperparameters (customize these)
+  batch_size: 64
+  lr: 0.001
+  weight_decay: 1.0
+  optimizer: "adamw"
+  # ... add all other training hyperparameters from the paper
+
+gop_tracking:
+  enabled: true
+  compute_full: true      # Compute full model GOP
+  compute_per_layer: true # Compute per-layer GOPs
+  frequency: 1            # Track every N epochs (1 = every epoch)
+  top_k_eigen: 100        # Number of top eigenvalues to keep
+  rank_threshold: 1.0e-6  # Threshold for effective rank computation
+  use_gpu: true           # Use GPU for GOP computation
+  store_eigenvectors: true # Store eigenvectors
+
+storage:
+  output_dir: "./results/XX_experiment_name"
+  compression: "gzip"     # "gzip", "lzf", or null
+  compression_level: 6    # 0-9 for gzip (higher = more compression, slower)
+  store_full_gop: true    # Store full GOP matrices (can be huge!)
+  float_precision: "float32"  # "float32" or "float64"
+
+computational_limits:
+  max_gop_size_gb: 100    # Warning threshold for GOP size
+  checkpoint_frequency: 1000  # Save checkpoints every N epochs
+  warn_if_exceeds_gb: 50  # Warn if storage exceeds this
+
+# Optional: Add custom fields for your specific experiment
+custom:
+  notes: "Any experiment-specific notes"
+  # Add custom parameters here
+
