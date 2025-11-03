@@ -12,14 +12,14 @@
 
 mkdir -p logs checkpoints
 
-# Load modules
-module load python/3.9
+# Load CUDA module
 module load cuda/11.8
 
-cd $SLURM_SUBMIT_DIR
+# Activate conda environment
+source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
+conda activate /om2/user/mabdel03/conda_envs/SLT_Proj_Env
 
-# Install dependencies
-pip install torch numpy matplotlib scipy --quiet
+cd $SLURM_SUBMIT_DIR
 
 # Run 1-layer linear teacher-student
 # Demonstrates grokking in a solvable linear model
