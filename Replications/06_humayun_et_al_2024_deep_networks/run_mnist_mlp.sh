@@ -4,16 +4,13 @@
 #SBATCH --error=logs/mnist_mlp_%j.err
 #SBATCH --time=48:00:00
 #SBATCH --mem=16G
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=4
 
 # Deep Networks Always Grok and Here is Why
 # Humayun et al. (2024)
 
 mkdir -p logs checkpoints data
-
-# Load CUDA module
-module load cuda/11.8
 
 # Activate conda environment
 source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
