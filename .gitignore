@@ -1,1 +1,41 @@
 .DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# SLURM output files
+*.out
+*.err
+slurm-*.out
+
+# Training outputs
+checkpoints/
+logs/*.log
+results/
+*.h5
+*.pt
+*.pth
+
+# Data files
+data/MNIST/
+data/*.gz
+*.pkl
+*.pickle
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Notebooks
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
