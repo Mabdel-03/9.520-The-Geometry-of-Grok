@@ -3,7 +3,7 @@
 #SBATCH --partition=use-everything
 #SBATCH --output=01_power_et_al_2022_openai_grok/logs/power_logged_%j.out
 #SBATCH --error=01_power_et_al_2022_openai_grok/logs/power_logged_%j.err
-#SBATCH --time=6:00:00
+#SBATCH --time=12:00:00
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=4
@@ -28,13 +28,12 @@ pip install -e . --quiet 2>/dev/null || echo "Package already installed"
 
 # Run with custom logging
 python train_with_logging.py \
-    --math_operator=x+y \
+    --math_operator="+" \
     --train_data_pct=0.5 \
     --weight_decay=1.0 \
     --max_lr=1e-3 \
-    --max_steps=50000 \
-    --val_every=500 \
+    --max_steps=100000 \
     --logdir=./logs
 
-echo "Training complete! Check logs/training_history.json"
+echo "Training complete! Check logs/ for outputs"
 

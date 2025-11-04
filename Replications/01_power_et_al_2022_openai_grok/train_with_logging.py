@@ -8,54 +8,57 @@ import json
 import os
 import sys
 from pathlib import Path
+import pandas as pd
+import glob
 
 # Add the grok module to path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import grok
-import pytorch_lightning as pl
-from pytorch_lightning.callbacks import Callback
 
-class MetricsLogger(Callback):
-    """Custom callback to log training metrics"""
-    def __init__(self, log_file):
-        super().__init__()
-        self.log_file = log_file
-        self.metrics = {
-            'epoch': [],
-            'train_loss': [],
-            'train_acc': [],
-            'test_loss': [],
-            'test_acc': []
-        }
+
+def convert_csv_to_json(logdir):
+    """Convert PyTorch Lightning CSV logs to training_history.json format"""
+    # Find the metrics CSV file
+    csv_files = glob.glob(os.path.join(logdir, "*/metrics.csv"))
     
-    def on_validation_end(self, trainer, pl_module):
-        """Called at the end of validation"""
-        # Get metrics from trainer
-        metrics = trainer.callback_metrics
-        
-        self.metrics['epoch'].append(trainer.current_epoch)
-        
-        # Extract train metrics
-        if 'train_loss' in metrics:
-            self.metrics['train_loss'].append(float(metrics['train_loss']))
-        if 'train_accuracy' in metrics:
-            self.metrics['train_acc'].append(float(metrics['train_accuracy']))
-        
-        # Extract validation/test metrics  
-        if 'val_loss' in metrics:
-            self.metrics['test_loss'].append(float(metrics['val_loss']))
-        if 'val_accuracy' in metrics:
-            self.metrics['test_acc'].append(float(metrics['val_accuracy']))
-        
-        # Save after each logging step
-        with open(self.log_file, 'w') as f:
-            json.dump(self.metrics, f, indent=2)
+    if not csv_files:
+        csv_files = glob.glob(os.path.join(logdir, "lightning_logs/*/metrics.csv"))
     
-    def on_train_end(self, trainer, pl_module):
-        """Save final metrics"""
-        with open(self.log_file, 'w') as f:
-            json.dump(self.metrics, f, indent=2)
+    if not csv_files:
+        print(f"Warning: No metrics.csv found in {logdir}")
+        return None
+    
+    # Use the most recent version
+    csv_file = sorted(csv_files)[-1]
+    print(f"Reading metrics from: {csv_file}")
+    
+    df = pd.read_csv(csv_file)
+    
+    # Initialize output dictionary
+    history = {
+        'epoch': [],
+        'train_loss': [],
+        'train_acc': [],
+        'test_loss': [],
+        'test_acc': []
+    }
+    
+    # Group by step (multiple rows per step due to train/val logging)
+    for step, group in df.groupby('step'):
+        # Get the last row for this step (most complete)
+        row = group.iloc[-1]
+        
+        history['epoch'].append(int(row['epoch']) if 'epoch' in row and not pd.isna(row['epoch']) else int(step))
+        
+        # Extract metrics (handle different possible column names)
+        history['train_loss'].append(float(row['train_loss']) if 'train_loss' in row and not pd.isna(row['train_loss']) else None)
+        history['train_acc'].append(float(row['train_accuracy']) if 'train_accuracy' in row and not pd.isna(row['train_accuracy']) else None)
+        history['test_loss'].append(float(row['val_loss']) if 'val_loss' in row and not pd.isna(row['val_loss']) else None)
+        history['test_acc'].append(float(row['val_accuracy']) if 'val_accuracy' in row and not pd.isna(row['val_accuracy']) else None)
+    
+    # Remove None values (keep lists aligned)
+    return history
 
 
 if __name__ == '__main__':
@@ -69,11 +72,34 @@ if __name__ == '__main__':
     os.makedirs(hparams.logdir, exist_ok=True)
     log_file = os.path.join(hparams.logdir, 'training_history.json')
     
+    print("=" * 80)
+    print("Paper 01: Power et al. (2022) - OpenAI Grok")
+    print("=" * 80)
     print(f"Logging directory: {hparams.logdir}")
-    print(f"Metrics will be saved to: {log_file}")
-    print(f"Hyperparameters: {hparams}")
+    print(f"Hyperparameters:")
+    print(f"  - Operation: {hparams.math_operator}")
+    print(f"  - Training data: {hparams.train_data_pct*100}%")
+    print(f"  - Weight decay: {hparams.weight_decay}")
+    print(f"  - Learning rate: {hparams.max_lr}")
+    print(f"  - Max steps: {hparams.max_steps}")
+    print("=" * 80)
     
-    # Train with custom logger
+    # Train model
     result = grok.training.train(hparams)
-    print(f"Training complete! Results saved to {result}")
+    
+    print("=" * 80)
+    print("Training complete! Converting logs to standard format...")
+    
+    # Convert CSV logs to JSON
+    history = convert_csv_to_json(hparams.logdir)
+    
+    if history:
+        with open(log_file, 'w') as f:
+            json.dump(history, f, indent=2)
+        print(f"✓ Metrics saved to: {log_file}")
+        print(f"✓ Total epochs logged: {len(history['epoch'])}")
+    else:
+        print("✗ Failed to convert metrics")
+    
+    print("=" * 80)
 

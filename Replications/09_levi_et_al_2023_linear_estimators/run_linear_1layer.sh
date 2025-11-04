@@ -2,7 +2,7 @@
 #SBATCH --job-name=grok_linear_1layer
 #SBATCH --output=linear_1layer_%j.out
 #SBATCH --error=linear_1layer_%j.err
-#SBATCH --time=72:00:00
+#SBATCH --time=48:00:00
 #SBATCH --mem=8G
 #SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=2
