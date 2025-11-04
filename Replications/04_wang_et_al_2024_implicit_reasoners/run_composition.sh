@@ -1,10 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=grok_wang_comp
-#SBATCH --output=logs/composition_%j.out
-#SBATCH --error=logs/composition_%j.err
-#SBATCH --time=48:00:00
+#SBATCH --partition=use-everything
+#SBATCH --output=composition_%j.out
+#SBATCH --error=composition_%j.err
+#SBATCH --time=72:00:00
 #SBATCH --mem=32G
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=8
 
 # Grokked Transformers are Implicit Reasoners
@@ -12,27 +13,25 @@
 
 mkdir -p logs
 
-# Load modules
-module load python/3.9
-module load cuda/11.8
+# Activate conda environment
+source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
+conda activate /om2/user/mabdel03/conda_envs/SLT_Proj_Env
 
-cd $SLURM_SUBMIT_DIR
+# Ensure we're in the right directory
+if [ -z "$SLURM_SUBMIT_DIR" ]; then
+    SLURM_SUBMIT_DIR="$(pwd)"
+fi
+cd "$SLURM_SUBMIT_DIR"
 
-# Install dependencies
-pip install -r requirements.txt --quiet 2>/dev/null || pip install torch transformers datasets --quiet
+echo "Working directory: $(pwd)"
+ls main.py || { echo "ERROR: main.py not found!"; exit 1; }
 
-# Run composition reasoning task
-# This runs the main grokking experiments on knowledge graph reasoning
+# Install simpletransformers (this repo includes custom implementation)
+pip install simpletransformers pandas --quiet 2>/dev/null || echo "Dependencies check"
 
-python src/train.py \
-    --task=composition \
-    --model_size=base \
-    --num_entities=2000 \
-    --batch_size=512 \
-    --lr=1e-4 \
-    --weight_decay=0.1 \
-    --max_steps=2000000 \
-    --save_steps=10000
+# Run main.py which contains the training logic
+# This trains on knowledge graph composition task
+python main.py
 
 echo "Composition task training complete!"
 

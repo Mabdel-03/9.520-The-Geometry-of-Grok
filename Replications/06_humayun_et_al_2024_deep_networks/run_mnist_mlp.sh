@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=grok_humayun_mnist
-#SBATCH --output=logs/mnist_mlp_%j.out
-#SBATCH --error=logs/mnist_mlp_%j.err
+#SBATCH --output=mnist_mlp_%j.out
+#SBATCH --error=mnist_mlp_%j.err
 #SBATCH --time=48:00:00
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:a100:1

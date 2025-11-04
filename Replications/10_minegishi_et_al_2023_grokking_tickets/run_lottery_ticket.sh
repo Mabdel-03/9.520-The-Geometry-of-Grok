@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=grok_lottery
-#SBATCH --output=logs/lottery_ticket_%j.out
-#SBATCH --error=logs/lottery_ticket_%j.err
+#SBATCH --output=lottery_ticket_%j.out
+#SBATCH --error=lottery_ticket_%j.err
 #SBATCH --time=24:00:00
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:a100:1
@@ -16,15 +16,25 @@ mkdir -p logs
 source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
 conda activate /om2/user/mabdel03/conda_envs/SLT_Proj_Env
 
-cd $SLURM_SUBMIT_DIR
+# Ensure we're in the right directory
+if [ -z "$SLURM_SUBMIT_DIR" ]; then
+    SLURM_SUBMIT_DIR="$(pwd)"
+fi
+cd "$SLURM_SUBMIT_DIR"
 
-# Run lottery ticket experiment
-# Train -> prune -> retrain to observe accelerated grokking
+echo "Working directory: $(pwd)"
+ls train.py || { echo "ERROR: train.py not found!"; exit 1; }
 
-python main.py \
-    --dataset=modular_addition \
-    --pruning_rate=0.6 \
-    --seed=42
+# Install required packages
+pip install wandb torcheval einops --quiet 2>/dev/null || echo "Dependencies check"
+
+# Run lottery ticket experiment on modular addition
+# Train with pruning to observe accelerated grokking
+python train.py \
+    --task modular_addition \
+    --seed 42 \
+    --epochs 100000 \
+    --log_interval 1000
 
 echo "Lottery ticket experiment complete!"
 

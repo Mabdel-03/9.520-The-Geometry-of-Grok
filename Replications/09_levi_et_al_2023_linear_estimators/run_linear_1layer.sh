@@ -1,14 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=grok_linear_1layer
-#SBATCH --output=logs/linear_1layer_%j.out
-#SBATCH --error=logs/linear_1layer_%j.err
-#SBATCH --time=12:00:00
+#SBATCH --output=linear_1layer_%j.out
+#SBATCH --error=linear_1layer_%j.err
+#SBATCH --time=72:00:00
 #SBATCH --mem=8G
 #SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=2
 
 # Grokking in Linear Estimators
 # Levi et al. (2023)
+# NOTE: Extended to 1M epochs - linear models need much longer training to grok
 
 mkdir -p logs checkpoints
 
@@ -16,10 +17,18 @@ mkdir -p logs checkpoints
 source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
 conda activate /om2/user/mabdel03/conda_envs/SLT_Proj_Env
 
-cd $SLURM_SUBMIT_DIR
+# Ensure we're in the right directory
+if [ -z "$SLURM_SUBMIT_DIR" ]; then
+    SLURM_SUBMIT_DIR="$(pwd)"
+fi
+cd "$SLURM_SUBMIT_DIR"
+
+echo "Working directory: $(pwd)"
+ls train.py || { echo "ERROR: train.py not found!"; exit 1; }
 
 # Run 1-layer linear teacher-student
 # Demonstrates grokking in a solvable linear model
+# Massively extended epochs as linear models require extensive overtraining
 python train.py \
     --architecture=1layer \
     --d_in=1000 \
@@ -27,9 +36,9 @@ python train.py \
     --n_train=500 \
     --n_test=10000 \
     --lr=0.01 \
-    --weight_decay=0.01 \
-    --n_epochs=100000 \
-    --log_interval=100 \
+    --weight_decay=0.1 \
+    --n_epochs=1000000 \
+    --log_interval=1000 \
     --accuracy_threshold=1e-3 \
     --device=cuda \
     --seed=42

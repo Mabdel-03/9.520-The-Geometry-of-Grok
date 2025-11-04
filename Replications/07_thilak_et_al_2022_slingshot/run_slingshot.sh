@@ -1,14 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=grok_slingshot
-#SBATCH --output=logs/slingshot_%j.out
-#SBATCH --error=logs/slingshot_%j.err
-#SBATCH --time=24:00:00
+#SBATCH --output=slingshot_%j.out
+#SBATCH --error=slingshot_%j.err
+#SBATCH --time=48:00:00
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=4
 
 # The Slingshot Mechanism
 # Thilak et al. (2022)
+# NOTE: Extended to 300K epochs to observe full slingshot/grokking cycle
 
 mkdir -p logs checkpoints
 
@@ -16,18 +17,25 @@ mkdir -p logs checkpoints
 source /om2/user/mabdel03/anaconda/etc/profile.d/conda.sh
 conda activate /om2/user/mabdel03/conda_envs/SLT_Proj_Env
 
-cd $SLURM_SUBMIT_DIR
+# Ensure we're in the right directory
+if [ -z "$SLURM_SUBMIT_DIR" ]; then
+    SLURM_SUBMIT_DIR="$(pwd)"
+fi
+cd "$SLURM_SUBMIT_DIR"
 
-# Run Slingshot experiment with Adam (no weight decay)
-# Track last-layer weight norms for cyclic Slingshot behavior
+echo "Working directory: $(pwd)"
+ls train.py || { echo "ERROR: train.py not found!"; exit 1; }
+
+# Run Slingshot experiment with weight decay to trigger grokking
+# The slingshot paper shows grokking requires weight decay
 python train.py \
     --p=97 \
     --train_fraction=0.5 \
     --optimizer=adam \
     --lr=0.001 \
-    --weight_decay=0.0 \
-    --n_epochs=50000 \
-    --log_interval=50 \
+    --weight_decay=1.0 \
+    --n_epochs=300000 \
+    --log_interval=500 \
     --device=cuda \
     --seed=42
 

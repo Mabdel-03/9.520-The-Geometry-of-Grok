@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=grok_power_modadd
 #SBATCH --partition=use-everything
-#SBATCH --output=logs/modular_addition_%j.out
-#SBATCH --error=logs/modular_addition_%j.err
+#SBATCH --output=modular_addition_%j.out
+#SBATCH --error=modular_addition_%j.err
 #SBATCH --time=24:00:00
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:a100:1
@@ -33,14 +33,13 @@ pip install -e . --quiet 2>/dev/null || echo "Package already installed"
 # - Optimizer: AdamW
 
 python scripts/train.py \
-    --operation=x+y \
-    --prime=97 \
-    --training_fraction=0.5 \
-    --weight_decay=1 \
-    --learning_rate=1e-3 \
-    --optimizer=adamw \
-    --steps=100000 \
-    --save_every=1000
+    --math_operator=x+y \
+    --train_data_pct=0.5 \
+    --weight_decay=1.0 \
+    --max_lr=1e-3 \
+    --max_steps=100000 \
+    --save_activations \
+    --save_outputs
 
 echo "Training complete!"
 
