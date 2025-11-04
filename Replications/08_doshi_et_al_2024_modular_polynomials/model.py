@@ -8,6 +8,7 @@ where phi(x) = x^S (element-wise power activation)
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class PowerActivationMLP(nn.Module):
@@ -173,7 +174,4 @@ def create_modular_multiplication_dataset(p, train_fraction=0.5, exponents=(1, 1
     test_idx = perm[n_train:]
     
     return data[train_idx], labels[train_idx], data[test_idx], labels[test_idx]
-
-
-import torch.nn.functional as F
 

@@ -85,6 +85,26 @@ class ModularArithmeticTransformer(nn.Module):
         # Output projection (last layer - track this for Slingshot)
         self.output_layer = nn.Linear(d_model, p, bias=True)
         
+        # Initialize weights properly
+        self._init_weights()
+    
+    def _init_weights(self):
+        """Initialize weights with proper scaling"""
+        # Initialize embeddings
+        nn.init.normal_(self.token_embed.weight, std=0.02)
+        nn.init.normal_(self.pos_embed.weight, std=0.02)
+        
+        # Initialize transformer layers
+        for layer in self.layers:
+            for p in layer.parameters():
+                if p.dim() > 1:
+                    nn.init.xavier_uniform_(p)
+        
+        # Initialize output layer
+        nn.init.normal_(self.output_layer.weight, std=0.02)
+        if self.output_layer.bias is not None:
+            nn.init.zeros_(self.output_layer.bias)
+        
     def forward(self, x):
         batch_size = x.shape[0]
         
