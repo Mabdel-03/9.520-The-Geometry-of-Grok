@@ -30,7 +30,7 @@ pip install -e . --quiet 2>/dev/null || echo "Package already installed"
 echo "Starting training..."
 python scripts/train.py \
     --math_operator="+" \
-    --train_data_pct=0.5 \
+    --train_data_pct=50 \
     --weight_decay=1.0 \
     --max_lr=1e-3 \
     --max_steps=100000 \

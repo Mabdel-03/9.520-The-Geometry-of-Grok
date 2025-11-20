@@ -366,7 +366,7 @@ def train(size, init_scale, wd):
     vocab_size = len(vocab) + 1 #extra 1 for padding
     embedding_dim = 64
     output_dim = 1
-    hidden_dim = 256
+    hidden_dim = 128
 
 
     model = SentimentRNN(no_layers,vocab_size,hidden_dim,embedding_dim,drop_prob=0.0)

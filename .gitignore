@@ -15,16 +15,42 @@ slurm-*.out
 # Training outputs
 checkpoints/
 logs/*.log
+logs/*.json
 results/
 *.h5
 *.pt
 *.pth
+*.ckpt
+*.safetensors
 
-# Data files
+# Data files - Archives
+*.tar.gz
+*.tgz
+*.tar
+*.gz
+*.zip
+*.7z
+
+# Data files - Datasets
 data/MNIST/
-data/*.gz
+data/cifar-10-batches-py/
+data/imagenette2-320/
+**/data/MNIST/
+**/data/cifar-10-batches-py/
+**/data/imagenette2-320/
+**/data/*.tar.gz
+**/data/*.tgz
+**/data/*.zip
 *.pkl
 *.pickle
+
+# Image files (for large datasets)
+*.JPEG
+*.jpeg
+*.jpg
+*.png
+*.bmp
+*.tiff
 
 # Temporary files
 *.tmp
@@ -39,3 +65,8 @@ data/*.gz
 .vscode/
 .idea/
 *.code-workspace
+
+# Large result files
+**/results/
+**/logs/training_history.json
+**/checkpoints/
