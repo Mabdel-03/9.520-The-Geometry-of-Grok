@@ -11,6 +11,9 @@ __pycache__/
 *.out
 *.err
 slurm-*.out
+**/logs/*.out
+**/logs/*.err
+slurm_scripts/logs/
 
 # Training outputs
 checkpoints/
@@ -22,6 +25,10 @@ results/
 *.pth
 *.ckpt
 *.safetensors
+*.bin
+**/checkpoint-*/
+**/model.safetensors
+**/pytorch_model.bin
 
 # Data files - Archives
 *.tar.gz
@@ -70,3 +77,12 @@ data/imagenette2-320/
 **/results/
 **/logs/training_history.json
 **/checkpoints/
+
+# Optimizer experiments output
+New_Explorations/optimizer_experiments/results/
+New_Explorations/optimizer_experiments/**/checkpoints/
+
+# Large replication output directories
+Replications/**/output_dir/**/checkpoint-*/
+Replications/**/cache_dir/
+Replications/**/runs/
