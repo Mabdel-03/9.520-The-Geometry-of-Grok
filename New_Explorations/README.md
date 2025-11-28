@@ -1,244 +1,158 @@
-# Gradient Outer Product Analysis Framework
+# Grokking Experiments - New Explorations
 
-This directory contains a unified framework for analyzing gradient outer products (GOPs) across all 10 grokking paper replications.
+Clean, organized experiments for analyzing grokking phenomena with and without AGOP tracking.
 
-## Overview
+---
 
-The framework instruments existing training code from `Replications/` to compute and store:
-- **Train/test loss and accuracy** at every epoch
-- **Full gradient outer product matrices** (G ⊗ G^T)
-- **Per-layer GOP matrices** for each model layer
-- **GOP metrics**: eigenvalues, trace, norms, rank, condition number
-- **Storage**: All data stored in compressed HDF5 format
-
-## Quick Start
-
-### 1. Install Dependencies
-
-```bash
-cd New_Explorations
-pip install -r requirements.txt
-```
-
-### 2. Run an Experiment
-
-```bash
-# Example: Run GOP analysis on Nanda et al. (smallest model)
-cd experiments/03_nanda_progress
-python wrapped_train.py --config ../../configs/03_nanda_progress.yaml
-```
-
-### 3. Analyze Results
-
-```bash
-cd analysis
-python visualize_gop.py --experiment 03_nanda_progress
-```
-
-## Directory Structure
+## 📁 Directory Structure
 
 ```
 New_Explorations/
-├── README.md                    # This file
-├── requirements.txt             # Python dependencies
-├── framework/                   # Core GOP tracking modules
-│   ├── gop_tracker.py          # Gradient and GOP computation
-│   ├── gop_metrics.py          # Eigenvalue and metric calculations
-│   ├── storage.py              # HDF5 storage management
-│   ├── wrapper.py              # Training loop instrumentation
-│   └── config.py               # Configuration management
-├── configs/                     # Per-experiment YAML configs
-│   ├── 01_power_grok.yaml
-│   ├── 02_liu_effective.yaml
-│   └── ... (10 configs total)
-├── experiments/                 # Wrapped training scripts
-│   ├── 01_power_et_al/
-│   │   ├── wrapped_train.py
-│   │   └── run_gop_analysis.sh
-│   └── ... (10 experiment dirs)
-├── analysis/                    # Analysis and visualization tools
-│   ├── visualize_gop.py
-│   ├── compare_experiments.py
-│   └── detect_grokking.py
-└── results/                     # Output data (created at runtime)
-    ├── 01_power_grok/
-    │   ├── metrics.h5          # Scalar time series
-    │   ├── gop_full.h5         # Full GOP matrices
-    │   ├── gop_layers.h5       # Per-layer GOPs
-    │   └── config.yaml         # Config snapshot
-    └── ... (results per experiment)
+├── standard_experiments/     # Experiments WITHOUT AGOP tracking
+│   ├── datasets/             # Dataset-specific implementations
+│   ├── framework/            # Shared training framework
+│   └── slurm_scripts/        # Batch job submission
+│
+├── agop_experiments/         # Experiments WITH AGOP tracking (tractable!)
+│   ├── core/                 # AGOP implementation (one-hot encoding)
+│   ├── training_scripts/     # Training with AGOP metrics
+│   ├── analysis/             # Visualization and comparison tools
+│   ├── tests/                # Verification tests
+│   └── slurm_scripts/        # AGOP batch jobs
+│
+└── docs/                     # Consolidated documentation
 ```
 
-## Framework Components
+---
 
-### GOP Tracker (`framework/gop_tracker.py`)
+## 🚀 Quick Start
 
-Computes gradient outer products:
-- Full model gradient: `G = flatten([grad(p) for p in model.parameters()])`
-- Outer product: `GOP = G ⊗ G^T` (M × M matrix for M parameters)
-- Per-layer: Separate GOP for each layer
+### Standard Experiments (No AGOP)
 
-### GOP Metrics (`framework/gop_metrics.py`)
-
-Computes comprehensive metrics:
-- Full eigenvalue spectrum
-- Top-k eigenvalues and eigenvectors
-- Trace, Frobenius norm, spectral norm
-- Rank, condition number, determinant
-
-### HDF5 Storage (`framework/storage.py`)
-
-Efficient compressed storage:
-- `metrics.h5`: Scalars (loss, accuracy, GOP metrics) vs epoch
-- `gop_full.h5`: Full GOP matrices per epoch with compression
-- `gop_layers.h5`: Per-layer GOP matrices
-
-### Training Wrapper (`framework/wrapper.py`)
-
-Minimal instrumentation of existing training code:
-- Hooks into training loop after backward pass
-- Computes GOP before optimizer step
-- Saves data incrementally to avoid memory issues
-
-## Computational Considerations
-
-### Storage Requirements
-
-| Model       | Parameters | GOP Size/Epoch | Compressed | Total (40K epochs) |
-|-------------|-----------|----------------|------------|-------------------|
-| Nanda       | ~100K     | 40 GB          | ~4 GB      | 160 TB            |
-| Power       | ~500K     | 1 TB           | ~100 GB    | 4 PB              |
-| Wang (large)| ~85M      | 28 PB          | -          | Infeasible        |
-
-**Notes:**
-- For large models, store only metrics + top-k eigenvalues
-- Use aggressive compression (gzip level 6-9)
-- Per-layer GOPs are more storage-friendly
-- Consider sampling frequency for full GOPs
-
-### Compute Time
-
-- GOP formation: O(M²) for M parameters
-- Eigenvalue decomposition: O(M³)
-- Estimate: ~10-1000 seconds per epoch depending on model size
-
-## Running on HPC
-
-Each experiment has a SLURM script:
+For running experiments from papers without AGOP overhead:
 
 ```bash
-cd experiments/03_nanda_progress
-sbatch run_gop_analysis.sh
+cd standard_experiments/
+
+# See available datasets
+ls datasets/
+
+# Run experiment (see standard_experiments/README.md)
 ```
 
-Adjust SLURM parameters for your cluster:
-- Memory: 64-256 GB depending on model size
-- Time: 24-72 hours
-- GPU: 1 GPU recommended
+### AGOP Experiments (Tractable Input-Gradient Tracking)
 
-## Configuration
-
-Each experiment has a YAML config specifying:
-- Model location and architecture
-- Training hyperparameters
-- GOP tracking settings (frequency, compression, storage options)
-- Computational limits
-
-Example config:
-```yaml
-experiment:
-  name: "nanda_progress_modular_addition"
-  
-gop_tracking:
-  enabled: true
-  compute_full: true
-  compute_per_layer: true
-  frequency: 1  # every epoch
-  
-storage:
-  compression: "gzip"
-  compression_level: 6
-  store_full_gop: true
-```
-
-## Analysis Tools
-
-### Visualize GOP Evolution
+For mechanistic analysis with tractable AGOP metrics:
 
 ```bash
-python analysis/visualize_gop.py --experiment 03_nanda_progress
+cd agop_experiments/
+
+# Quick test (verify setup)
+python tests/test_onehot_complete.py
+
+# Run single experiment
+python training_scripts/train_nanda_agop.py \
+    --architecture mlp \
+    --optimizer adamw \
+    --n_epochs 40000
+
+# Submit batch jobs
+cd slurm_scripts/
+sbatch run_nanda_agop.sh
 ```
 
-Creates plots:
-- Eigenvalue spectrum evolution over epochs
-- GOP metrics (trace, norms) vs epoch
-- Correlation with train/test loss
+**See [`agop_experiments/README.md`](agop_experiments/README.md) for complete guide.**
 
-### Compare Experiments
+---
+
+## 🎯 Key Differences
+
+| Feature | Standard Experiments | AGOP Experiments |
+|---------|---------------------|------------------|
+| **Purpose** | Replicate papers, test optimizers | Mechanistic analysis of grokking |
+| **Architecture** | Original (transformers with embeddings) | One-hot encoded (MLP or Transformer) |
+| **Inputs** | Discrete tokens | Continuous one-hot vectors |
+| **AGOP Tracking** | ❌ No (or expensive parameter-gradient) | ✅ Yes (tractable input-gradient) |
+| **Metrics** | Train/test accuracy, loss | + 19 AGOP metrics (eigengap, VCR, etc.) |
+| **Tractability** | N/A | ✅ Matrices <5 MB, compute in seconds |
+
+---
+
+## 📊 Datasets Available
+
+Both experiment types support:
+
+1. **Nanda** - Modular addition (p=113, ReLU transformer)
+2. **Softmax** - Modular addition (p=97, standard transformer)
+3. **MNIST** - Image classification (Omnigrok setup)
+4. **Composition** - Compositional reasoning (placeholder)
+
+---
+
+## 📚 Documentation
+
+- **This file** - Navigation and overview
+- [`standard_experiments/README.md`](standard_experiments/README.md) - Standard experiments guide
+- [`agop_experiments/README.md`](agop_experiments/README.md) - Complete AGOP guide
+- [`docs/`](docs/) - Implementation history, troubleshooting, technical details
+
+---
+
+## ⚡ Recommended Workflow
+
+### 1. Start with AGOP Experiments (Most Valuable)
+
+The AGOP experiments provide mechanistic insights into grokking:
 
 ```bash
-python analysis/compare_experiments.py --experiments 03_nanda_progress 07_thilak_slingshot
+cd agop_experiments/
+python tests/test_onehot_complete.py  # Verify setup (6/6 tests)
+sbatch tests/test_quick_train.sh       # Short training test
+sbatch slurm_scripts/run_nanda_agop.sh  # Full experiment
 ```
 
-Overlays GOP metrics from multiple experiments.
-
-### Detect Grokking
+### 2. Analyze Results
 
 ```bash
-python analysis/detect_grokking.py --experiment 03_nanda_progress
+cd agop_experiments/analysis/
+python visualize_agop_metrics.py --results_dir ../results/...
+python compare_grok_nogrok.py --results_dir ../results/...
 ```
 
-Automatically identifies grokking transitions using GOP metrics.
+### 3. Compare to Standard Experiments (Optional)
 
-## Safety Features
+Run baseline experiments without AGOP overhead if needed for comparison.
 
-1. **Storage monitoring**: Warns if disk usage exceeds threshold
-2. **Checkpointing**: Saves intermediate results every N epochs
-3. **Graceful degradation**: Falls back to metrics-only if GOP too large
-4. **Dry-run mode**: Estimates storage/compute before running
-5. **Configuration validation**: Checks feasibility before execution
+---
 
-## Validation
+## 🔬 Research Questions
 
-Before running full experiments, validate on small scale:
+The AGOP experiments enable you to answer:
 
-```bash
-# Run for 100 epochs on smallest model
-python experiments/03_nanda_progress/wrapped_train.py \
-    --config configs/03_nanda_progress.yaml \
-    --epochs 100
-```
+1. **When does grokking happen?** (test accuracy transition)
+2. **What predicts grokking?** (AGOP metric signatures)
+3. **Do architectures matter?** (MLP vs Transformer comparison)
+4. **Symbolic vs perceptual?** (Nanda vs MNIST comparison)
 
-## Expected Outputs
+---
 
-After training completes, each experiment produces:
-- `results/{experiment}/metrics.h5`: Time series of all scalars
-- `results/{experiment}/gop_full.h5`: Full GOP matrices (~TBs)
-- `results/{experiment}/gop_layers.h5`: Per-layer GOPs (~GBs)
-- Plots in `results/{experiment}/plots/`
+## 💻 Requirements
 
-## Troubleshooting
+- Python 3.10+
+- PyTorch 2.0+
+- See `requirements.txt` for full list
 
-**Out of memory during GOP computation:**
-- Reduce batch size
-- Enable per-layer only mode
-- Increase storage frequency (e.g., every 10 epochs)
+**Conda environment:** `/om/scratch/Tue/mabdel03/9.520/conda_envs/grok_exp`
 
-**Storage filling up:**
-- Increase compression level
-- Store only metrics + top-k eigenvalues
-- Use sampling strategy
+---
 
-**Slow eigenvalue decomposition:**
-- Use only top-k eigenvalues (`top_k_eigen: 100`)
-- Move eigenvalue computation to CPU
-- Enable parallel eigenvalue solver
+## 🆘 Support
 
-## Citation
+- **Troubleshooting:** See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)
+- **AGOP Guide:** See [`docs/AGOP_GUIDE.md`](docs/AGOP_GUIDE.md)
+- **Implementation History:** See [`docs/IMPLEMENTATION_HISTORY.md`](docs/IMPLEMENTATION_HISTORY.md)
 
-If you use this framework, please cite the original grokking papers (see `../Replications/README.md`) and this framework.
+---
 
-## Contact
-
-For issues or questions about the GOP analysis framework, see the main project repository.
-
+**Status:** ✅ Fully implemented and tested  
+**Last Updated:** November 25, 2024

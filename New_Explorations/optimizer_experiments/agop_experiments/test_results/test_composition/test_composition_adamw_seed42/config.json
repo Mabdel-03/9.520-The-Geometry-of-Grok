@@ -1,0 +1,21 @@
+{
+  "n_entities": 50,
+  "n_facts": 200,
+  "train_fraction": 0.3,
+  "vocab_size": 100,
+  "d_model": 128,
+  "n_heads": 4,
+  "n_layers": 2,
+  "optimizer": "adamw",
+  "lr": 0.001,
+  "weight_decay": 1.0,
+  "n_epochs": 200,
+  "device": "cuda",
+  "seed": 42,
+  "agop_freq": 50,
+  "agop_subsample": null,
+  "agop_top_k": 20,
+  "log_freq": 10,
+  "save_dir": "./test_results/test_composition",
+  "experiment_name": "test_composition_adamw_seed42"
+}

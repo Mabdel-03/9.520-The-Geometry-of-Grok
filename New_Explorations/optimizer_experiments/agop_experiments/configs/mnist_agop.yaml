@@ -1,0 +1,42 @@
+# Configuration for MNIST Omnigrok with AGOP tracking
+
+dataset:
+  name: "mnist_omnigrok"
+  train_points: 1000
+  input_dim: 784
+
+model:
+  type: "MNISTModel"
+  hidden_dim: 200
+  output_dim: 10
+  depth: 3
+  activation: "relu"
+  initialization_scale: 8.0
+
+training:
+  n_epochs: 50000
+  log_freq: 100
+  device: "cuda"
+  seed: 42
+  use_mse_loss: true  # Omnigrok uses MSE with one-hot targets
+
+optimizers:
+  - name: "adamw"
+    lr: 0.001
+    weight_decays: [0.01, 0.1, 0.5, 1.0]
+  - name: "muon"
+    lr: 0.001
+    weight_decays: [0.01, 0.1, 0.5, 1.0]
+  - name: "sgd"
+    lr: 0.01
+    weight_decays: [0.01, 0.1, 0.5, 1.0]
+
+agop:
+  enabled: true
+  freq: 100
+  top_k: 20
+  subsample: 500  # Subsample for memory efficiency (images are 784-dim)
+
+save:
+  dir: "./results/agop_experiments/mnist"
+

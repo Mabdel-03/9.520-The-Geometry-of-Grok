@@ -1,0 +1,39 @@
+# Configuration for Nanda modular addition with AGOP tracking
+
+dataset:
+  name: "nanda_modular_addition"
+  p: 113
+  train_fraction: 0.3
+
+model:
+  type: "OneLayerReLUTransformer"
+  d_model: 128
+  n_heads: 4
+  d_mlp: 512
+
+training:
+  n_epochs: 40000
+  log_freq: 100
+  device: "cuda"
+  seed: 42
+
+optimizers:
+  - name: "adamw"
+    lr: 0.001
+    weight_decays: [0.1, 1.0, 5.0, 10.0]
+  - name: "muon"
+    lr: 0.001
+    weight_decays: [0.1, 1.0, 5.0, 10.0]
+  - name: "sgd"
+    lr: 0.01
+    weight_decays: [0.1, 1.0, 5.0, 10.0]
+
+agop:
+  enabled: true
+  freq: 100
+  top_k: 20
+  subsample: null  # Use all training data
+
+save:
+  dir: "./results/agop_experiments/nanda"
+

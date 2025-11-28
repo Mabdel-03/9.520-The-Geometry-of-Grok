@@ -1,0 +1,55 @@
+================================================================
+           PROGRESS UPDATE - Excellent Results!
+================================================================
+Date: November 23, 2025, ~17:00 EST
+
+COMPLETE EXPERIMENTS: 63/87 (72%)
+
+✅ Nanda (ReLU): 24/24
+   - 6 grokked (AdamW)
+   
+✅ MNIST (MLP + MSE): 18/18
+   - 4 grokked (AdamW)
+   - MSE loss was critical!
+   
+✅ Softmax Transformer: 21/21 COMPLETE!
+   - 4 grokked (AdamW)
+   - AdamW wd=0.1, 0.5, 1.0: 100% accuracy
+   - AdamW wd=2.0: 97.3% accuracy
+   - Running time: ~29 hours
+
+RUNNING: 24/87 (28%)
+
+🔄 Composition (GPT-2): 19 started, 15 running
+   - Running 1-14 hours (early/mid stage)
+   - 28.8M parameter model
+   - Expected: 24-48 hours per job
+
+================================================================
+KEY FINDINGS SO FAR:
+================================================================
+
+1. AdamW Dominates Across All Datasets
+   - Nanda: 6/8 grokked
+   - MNIST: 4/7 grokked (with MSE)
+   - Softmax: 4/7 grokked
+   
+2. Weight Decay Sweet Spot: 0.1-1.0
+   - Consistent across all architectures
+   - Too low (0.0-0.01): No grokking
+   - Optimal (0.1-1.0): Perfect grokking
+   - Too high (2.0-5.0): Reduced performance
+
+3. MSE Loss Critical for MNIST
+   - CrossEntropy: 1 grokked
+   - MSE: 4 grokked
+   
+4. Softmax vs ReLU Transformers
+   - Both show grokking with AdamW
+   - Similar weight decay patterns
+   - Softmax compatible with Muon (results pending)
+
+================================================================
+NEXT: Wait for Muon and Composition results (1-2 days)
+================================================================
+Monitor: squeue -u mabdel03

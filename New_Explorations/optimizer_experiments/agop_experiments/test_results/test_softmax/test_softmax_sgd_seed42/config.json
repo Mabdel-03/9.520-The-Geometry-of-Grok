@@ -1,0 +1,21 @@
+{
+  "p": 97,
+  "train_fraction": 0.5,
+  "d_model": 128,
+  "n_heads": 4,
+  "n_layers": 2,
+  "d_ff": 512,
+  "dropout": 0.0,
+  "optimizer": "sgd",
+  "lr": 0.01,
+  "weight_decay": 1.0,
+  "n_epochs": 200,
+  "device": "cpu",
+  "seed": 42,
+  "agop_freq": 50,
+  "agop_subsample": null,
+  "agop_top_k": 20,
+  "log_freq": 10,
+  "save_dir": "./test_results/test_softmax",
+  "experiment_name": "test_softmax_sgd_seed42"
+}

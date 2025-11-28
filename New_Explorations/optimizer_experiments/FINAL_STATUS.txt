@@ -1,0 +1,21 @@
+╔════════════════════════════════════════════════════════════════╗
+║         ✅ MNIST EXPERIMENTS CORRECTED & QUEUED ✅             ║
+╚════════════════════════════════════════════════════════════════╝
+
+📋 Corrections Applied:
+  ✅ Loss: MSE (was CrossEntropy) - matches Paper 5
+  ✅ Dtype: float64 (was float32) - matches Paper 5  
+  ✅ GPU: A100 only (avoids CUDA errors)
+
+📊 Current Status:
+  • 18/18 MNIST jobs queued for A100 GPUs
+  • 24/24 Nanda complete (6 grokked!)
+  • Git pushed to GitHub (113 MB, cleaned)
+
+⏰ Timeline:
+  • Jobs start: When A100 available (hours to 1 day)
+  • Per job: 12-24 hours
+  • All complete: 1-3 days
+
+🎯 Monitor: squeue -u $USER | grep mnist
+📚 Read: CORRECTED_MNIST_STATUS.md for details

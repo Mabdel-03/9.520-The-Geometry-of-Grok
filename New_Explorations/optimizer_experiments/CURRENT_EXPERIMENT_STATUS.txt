@@ -1,0 +1,41 @@
+================================================================
+              CURRENT EXPERIMENT STATUS
+================================================================
+Date: November 23, 2025, ~16:30 EST
+
+COMPLETE EXPERIMENTS (42):
+  ✅ Nanda (ReLU Transformer): 24/24
+     - 6 grokked (AdamW wd=0.5-10.0)
+     
+  ✅ MNIST (MLP with MSE): 18/18  
+     - 4 grokked (AdamW wd=0.1, 0.5, 1.0)
+     - MSE loss was critical!
+
+RUNNING EXPERIMENTS (41):
+  🔄 Softmax Transformer (Modular Arithmetic): 17 running
+     - 3 optimizers × 7 weight decays = 21 total
+     - Testing real Muon on compatible architecture
+     - Running ~23 hours (longest)
+     
+  🔄 Composition (GPT-2): 24 queued/running
+     - 3 optimizers × 7 weight decays = 21 total
+     - Two-hop knowledge graph reasoning
+     - 181,000 train samples, 556 vocab
+     - GPT-2 with 28.8M parameters
+     - Fixed: transformers library installed, data loading corrected
+
+TOTAL: 83 experiments (42 complete, 41 running)
+
+KEY FIXES APPLIED:
+  ✅ transformers library installed in conda env
+  ✅ Data loading fixed (vocab list → dict mapping)
+  ✅ Composition jobs resubmitted and now running
+
+EXPECTED COMPLETION:
+  - Softmax: 1-2 days (running ~1 day already)
+  - Composition: 2-3 days (just started)
+
+================================================================
+Monitor: squeue -u mabdel03
+Dashboard: ./MONITORING_DASHBOARD.sh
+================================================================

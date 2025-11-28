@@ -1,0 +1,63 @@
+================================================================
+    RESULTS SUMMARY - 63 Complete Experiments
+================================================================
+
+COMPLETE DATASETS (3/4):
+  ✅ Nanda (ReLU Transformer): 24/24
+  ✅ MNIST (MLP + MSE): 18/18  
+  ✅ Softmax (Std Transformer): 21/21
+
+RUNNING:
+  🔄 Composition (GPT-2): 15/21 running
+
+================================================================
+KEY FINDINGS:
+================================================================
+
+1. ADAMW DOMINATES (13/21 grokked = 62%)
+   - Nanda: 5/8 grokked
+   - MNIST: 4/6 grokked
+   - Softmax: 4/7 grokked
+   
+2. OPTIMAL WEIGHT DECAY: 0.1-2.0 (universal!)
+   - Too low (<0.1): No grokking
+   - Perfect (0.1-2.0): Consistent grokking
+   - Too high (>5.0): Degraded performance
+   
+3. HIGHER WD → FASTER GROKKING
+   Softmax Transformer (AdamW):
+   - wd=0.1: 11,500 epochs
+   - wd=0.5: 2,700 epochs (4.3× faster)
+   - wd=1.0: 1,300 epochs (8.8× faster)
+   - wd=2.0: 800 epochs (14.4× fastest!)
+
+4. MUON FAILED (0/21 experiments)
+   - ReLU: Failed (expected - incompatible)
+   - Softmax: Failed (unexpected!)
+   - MLP: Failed (unexpected!)
+   - Conclusion: Implementation issue
+
+5. SGD VERY SLOW (2/21 grokked)
+   - Only works with very low wd (0.01 or less)
+   - Takes 36K-40K epochs (vs 1K-3K for AdamW)
+   
+6. MSE LOSS CRITICAL FOR MNIST
+   - MSE: 4 grokked
+   - CrossEntropy: 1 grokked
+   
+================================================================
+BEST CONFIGURATIONS:
+================================================================
+
+Modular Arithmetic:
+  ⭐ AdamW + wd=1.0-2.0 + Softmax Transformer
+  
+MNIST:
+  ⭐ AdamW + wd=0.1-0.5 + MSE loss
+  
+For Speed:
+  ⭐ AdamW + wd=2.0-5.0 (faster but may reduce accuracy)
+
+================================================================
+Read: RESULTS_SUMMARY_3_DATASETS.md for complete analysis
+================================================================

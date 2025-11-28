@@ -1,0 +1,19 @@
+{
+  "train_points": 500,
+  "hidden_dim": 200,
+  "depth": 3,
+  "activation": "relu",
+  "init_scale": 8.0,
+  "optimizer": "adamw",
+  "lr": 0.001,
+  "weight_decay": 0.1,
+  "n_epochs": 100,
+  "device": "cpu",
+  "seed": 42,
+  "agop_freq": 25,
+  "agop_subsample": 250,
+  "agop_top_k": 20,
+  "log_freq": 10,
+  "save_dir": "./test_results",
+  "experiment_name": "test_mnist"
+}

@@ -1,0 +1,57 @@
+====================================================================
+     ALL EXPERIMENTS IMPLEMENTED AND SUBMITTED
+====================================================================
+
+Date: November 23, 2025
+
+NEW EXPERIMENTS (42 submitted today):
+  - Modular Arithmetic (Softmax Transformer): 21
+  - Compositional Reasoning (GPT-2): 21
+
+RUNNING EXPERIMENTS:
+  - MNIST (3-Layer MLP): 18
+
+COMPLETE EXPERIMENTS:
+  - Modular Arithmetic (ReLU Transformer): 24
+
+TOTAL: 84 experiments (87 if count MN IST with real Muon)
+
+====================================================================
+KEY IMPROVEMENTS:
+====================================================================
+
+1. REAL Muon Optimizer
+   - Spectral norm constraints
+   - Second-order approximations
+   - As used in Tveit et al. (2025)
+
+2. Muon-Compatible Architectures
+   - Softmax Transformer for modular arithmetic
+   - GPT-2 for compositional reasoning
+   - Standard attention + normalization
+
+3. Comprehensive Testing
+   - 3 optimizers: AdamW, Muon, SGD
+   - 7 weight decay values per dataset
+   - 3 diverse task types
+
+====================================================================
+RESEARCH QUESTIONS:
+====================================================================
+
+Q1: Does Muon grok faster than AdamW across all datasets?
+Q2: How does weight decay affect time-to-grok for each optimizer?
+Q3: Are patterns universal or task-specific?
+Q4: Does architecture (ReLU vs Softmax) matter?
+
+====================================================================
+MONITOR:
+====================================================================
+
+squeue -u mabdel03          # Check queue
+./MONITORING_DASHBOARD.sh   # Live dashboard
+./check_status.py           # Detailed results
+
+Results: /om/scratch/Tue/mabdel03/9.520/results/optimizer_experiments/
+
+====================================================================

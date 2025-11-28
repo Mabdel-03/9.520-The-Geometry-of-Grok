@@ -1,0 +1,10 @@
+MISSING NANDA EXPERIMENTS:
+  nanda_mlp_muon_wd0.1_seed42
+  nanda_mlp_muon_wd1.0_seed42
+  nanda_mlp_muon_wd5.0_seed42
+  (1 more unknown)
+
+MISSING SOFTMAX EXPERIMENTS:
+  (Need to identify which 5 of 24)
+  
+Check which weight decays are missing for each arch×opt combo

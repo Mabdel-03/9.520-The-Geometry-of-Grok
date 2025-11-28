@@ -1,0 +1,41 @@
+# Configuration for Softmax Transformer modular addition with AGOP tracking
+
+dataset:
+  name: "softmax_modular_addition"
+  p: 97
+  train_fraction: 0.5
+
+model:
+  type: "StandardTransformer"
+  d_model: 128
+  n_heads: 4
+  n_layers: 2
+  d_ff: 512
+  dropout: 0.0
+
+training:
+  n_epochs: 50000
+  log_freq: 100
+  device: "cuda"
+  seed: 42
+
+optimizers:
+  - name: "adamw"
+    lr: 0.001
+    weight_decays: [0.01, 0.1, 0.5, 1.0]
+  - name: "muon"
+    lr: 0.001
+    weight_decays: [0.01, 0.1, 0.5, 1.0]
+  - name: "sgd"
+    lr: 0.01
+    weight_decays: [0.01, 0.1, 0.5, 1.0]
+
+agop:
+  enabled: true
+  freq: 100
+  top_k: 20
+  subsample: null
+
+save:
+  dir: "./results/agop_experiments/softmax"
+

@@ -1,0 +1,90 @@
+{
+  "summary": {
+    "total_tests": 12,
+    "successes": 0,
+    "failures": 12,
+    "total_time": 0.520972728729248
+  },
+  "results": {
+    "nanda": {
+      "adamw": {
+        "success": false,
+        "time": 0.04264545440673828,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_nanda_agop.py\", line 17, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      },
+      "muon": {
+        "success": false,
+        "time": 0.04329419136047363,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_nanda_agop.py\", line 17, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      },
+      "sgd": {
+        "success": false,
+        "time": 0.04367685317993164,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_nanda_agop.py\", line 17, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      }
+    },
+    "softmax": {
+      "adamw": {
+        "success": false,
+        "time": 0.042298316955566406,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_softmax_agop.py\", line 16, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      },
+      "muon": {
+        "success": false,
+        "time": 0.04223036766052246,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_softmax_agop.py\", line 16, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      },
+      "sgd": {
+        "success": false,
+        "time": 0.043853044509887695,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_softmax_agop.py\", line 16, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      }
+    },
+    "mnist": {
+      "adamw": {
+        "success": false,
+        "time": 0.043299198150634766,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_mnist_agop.py\", line 17, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      },
+      "muon": {
+        "success": false,
+        "time": 0.04499173164367676,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_mnist_agop.py\", line 17, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      },
+      "sgd": {
+        "success": false,
+        "time": 0.04352140426635742,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_mnist_agop.py\", line 17, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      }
+    },
+    "composition": {
+      "adamw": {
+        "success": false,
+        "time": 0.04338431358337402,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_composition_agop.py\", line 14, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      },
+      "muon": {
+        "success": false,
+        "time": 0.04401111602783203,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_composition_agop.py\", line 14, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      },
+      "sgd": {
+        "success": false,
+        "time": 0.04306149482727051,
+        "output_dir": null,
+        "error": "Traceback (most recent call last):\n  File \"/net/vast-storage/scratch/vast/lhtsai/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/optimizer_experiments/agop_experiments/train_composition_agop.py\", line 14, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n"
+      }
+    }
+  }
+}

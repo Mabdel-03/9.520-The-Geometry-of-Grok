@@ -1,0 +1,75 @@
+================================================================
+     ALL PLAN TASKS COMPLETE - Official Muon Integrated
+================================================================
+
+IMPLEMENTATION SUMMARY:
+
+✅ 1. Official Muon Downloaded
+   - Source: modded-nanogpt repository
+   - Newton-Schulz 5-iteration orthogonalization
+   - Proper per-layer LR scaling
+
+✅ 2. Custom Muon Backed Up
+   - Renamed: framework/muon_custom.py
+   - Kept for documentation
+
+✅ 3. Official Muon Integrated
+   - File: framework/muon_official.py
+   - Updated framework/__init__.py
+   - Updated framework/trainer.py
+
+✅ 4. Learning Rates Updated to 0.02
+   - paper03_softmax/train_modular_softmax.py
+   - paper05_omnigrok/train_mnist.py
+   - paper04_composition/train_composition.py
+
+✅ 5. Official Muon Tested
+   - Basic test: PASSED (shows learning)
+   - Ready for full experiments
+
+✅ 6. Muon Experiments Submitted
+   - 7 experiments on Softmax Transformer
+   - Jobs 44376226-44376233 running
+   - Using lr=0.02, wd=[0.0-5.0]
+
+⏳ 7. Results Analysis
+   - Pending completion (1-2 days)
+   - Will compare Official Muon vs AdamW vs Custom Muon
+
+================================================================
+CURRENT EXPERIMENT STATUS:
+================================================================
+
+COMPLETE (63 experiments):
+  • Nanda (ReLU): 24/24 (6 grokked)
+  • MNIST (MLP + MSE): 18/18 (4 grokked)
+  • Softmax (Std Transformer): 21/21 (4 grokked with AdamW)
+
+RUNNING (15+ experiments):
+  • Composition (GPT-2): ~15 running (1-2 days old)
+  • Official Muon (Softmax): 7 just submitted
+
+TOTAL: 63 complete + 22 running = 85+ experiments
+
+================================================================
+KEY CHANGES FROM CUSTOM TO OFFICIAL MUON:
+================================================================
+
+Learning Rate: 0.001 → 0.02 (20× HIGHER!)
+Orthogonalization: Simple projection → Newton-Schulz 5 iterations
+Spectral constraint: Hard clip → Normalize then orthogonalize
+Per-layer scaling: None → sqrt(rows/cols) adaptive scaling
+
+================================================================
+NEXT STEPS:
+================================================================
+
+1. Wait 1-2 days for official Muon results
+2. Compare official Muon vs AdamW
+3. Test if Muon groks faster (as in Tveit paper)
+4. Update final analysis with correct Muon results
+
+================================================================
+Monitor: squeue -u mabdel03
+Results will appear in: paper03_softmax/
+================================================================
