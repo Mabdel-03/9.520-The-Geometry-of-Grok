@@ -1,0 +1,15 @@
+metadata:
+  title: "(Power 2022) Epoches to Grok according to"
+  caption: "Model comparison for division mod 97."
+trials:
+  - model: NN
+    hyper: Adam, lr=0.001, wd=1
+    epoches: 1000
+    peakVCratioEpoch: 850
+    peakVCratio: 0.30
+  - model: NN 3 layer
+    hyper: Adam, lr=0.001, wd=1
+    epoches: 3000
+    peakVCratioEpoch: 2500
+    peakVCratio: 0.45
+
