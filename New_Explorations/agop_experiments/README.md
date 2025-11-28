@@ -279,7 +279,31 @@ For questions or issues, refer to the main optimizer experiments documentation a
 
 ---
 
-**Status**: Implementation complete ✓  
-**Last Updated**: Nov 2025  
+## Current Status
+
+**Experiments Completed**: 60/72 ✅  
+**AGOP Metrics Available**: 60/72 ✅  
+
+### Dataset Status:
+- **Nanda**: 24/24 directories (modular addition with ReLU transformer)
+- **Softmax**: 24/24 directories (modular addition with standard transformer)
+- **MNIST**: 12/12 directories (image classification with MLP)
+- **Composition**: 12/12 directories (compositional reasoning)
+
+### Key Findings:
+- 🎉 **Major Discovery**: Muon optimizer successfully groks on Softmax Transformer with one-hot inputs!
+- ✅ **Transformers** grok ~2.4× better than MLPs across datasets
+- ✅ **AdamW** most reliable optimizer for grokking (75% success rate on transformers)
+- ✅ **Softmax dataset** shows highest grokking rate (47%)
+
+For detailed results, see:
+- `COMPREHENSIVE_RESULTS_REPORT.md` - Full analysis of all experiments
+- `AGOP_RESULTS_SUMMARY.md` - Quick summary of key findings
+- `analysis/` directory - Jupyter notebooks with visualizations and statistical analysis
+
+---
+
+**Status**: Experiments complete, analysis in progress ✓  
+**Last Updated**: November 2025  
 **Maintainer**: Course project team
 
