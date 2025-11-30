@@ -15,14 +15,14 @@ by Gouki Minegishi, Yusuke Iwasawa, Yutaka Matsuo
    python -m venv env   # For pyvenv
    conda create -n myenv python=3.7.4   # For conda
    ```
-2. install the required dependencies.
+2. Install the required dependencies.
    ```bash
    pip install -r requirements.txt
    ```
 
 ## Configuration
 - configs/config.py : Modular Addition task
-- configs/config_mnist.py : Mnist Cllasification task
+- configs/config_mnist.py : Mnist Classification task
 
 ## Training Base Model (Dense)
 ### Modular addition
@@ -30,35 +30,35 @@ by Gouki Minegishi, Yusuke Iwasawa, Yutaka Matsuo
 ```bash
 python train.py --config configs/config.py
 ```
-Training confguration is written in `config/config.py`.
+Training configuration is written in `config/config.py`.
 
-### Mnist
+### MNIST
 
 ```bash
 python train_mnist.py --config configs/config_mnist.py
 ```
-Training confguration is written in `config/config_mnist.py`.
+Training configuration is written in `config/config_mnist.py`.
 
 ## Grokking Tickets
 ### Modular addition
 ```bash
 python prune.py --config configs/config_pruning.py
 ```
-Training confguration is written in `config/config_pruning.py`.
-### Mnist
+Training configuration is written in `config/config_pruning.py`.
+### MNIST
 ```bash
 python prune_mnist.py --config configs/config_pruning_mnist.py
 ```
 
-Training confguration is written in `config/config_pruning_mnist.py`.
-## Relusts
+Training configuration is written in `config/config_pruning_mnist.py`.
+## Results
 You can check the experimental results from wandb.  　　
 The following figure compares the Base Model (Dense) and the Grokking Ticket. It can be observed that the Grokking Ticket almost eliminates delayed generalization.
 <p align="center">
 <img src="assets/mlp_ma.png" width="50%"  />
 </p>
 
-## Visualize
+## Visualization
 The following command visualizes the difference in the acquisition dynamics of representations between the Base Model (left) and the Grokking Ticket (right).  
 ```bash
 python visualize.py --grok_weight_path <path to grok weight> ----weight_folder <path to base weight folder> --ticket_folder <path to ticket folder> --output_folder <path to output folder>
@@ -150,7 +150,7 @@ done
 ## Expected Results
 
 - **Grokking tickets** (from generalization) accelerate grokking dramatically
-- Tickets from earlier stages (init, memorization) don't accelerate
+- Tickets from earlier stages (init, memorization) do not accelerate
 - Optimal pruning rate around 60%
 - Can achieve grokking even with weight_decay=0 using good tickets
 
@@ -191,4 +191,3 @@ This repository is particularly interesting because:
   year={2023}
 }
 ```
-

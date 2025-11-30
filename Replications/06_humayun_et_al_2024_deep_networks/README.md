@@ -18,7 +18,7 @@ This paper demonstrates that grokking is widespread and occurs in practical sett
 - **CIFAR-10:** Standard dataset
 - **CIFAR-100:** Standard dataset
 - **Imagenette:** Subset of ImageNet with 10 classes
-- **Adversarial examples:** $\ell_\infty$-PGD with various $\epsilon$ values
+- **Adversarial examples:** ℓ∞-PGD with various ε values
 
 ## Model Architectures
 
@@ -37,7 +37,7 @@ This paper demonstrates that grokking is widespread and occurs in practical sett
 - **Weight decay:** 0 (most), 0.01 (MNIST-MLP)
 - **Loss function:** Cross-entropy
 - **Batch size:** 200 (MNIST), 64-512 (CIFAR)
-- **Training steps:** Extended ($10^5$ steps typical)
+- **Training steps:** Extended (10^5 steps typical)
 
 ## Setup and Installation
 
@@ -161,8 +161,8 @@ python train.py \
   "train_acc": [...],
   "test_loss": [...],
   "test_acc": [...],
-  "adv_acc_eps_0.06": [...],  # Adversarial accuracy at ε=0.06
-  "adv_acc_eps_0.10": [...],  # Adversarial accuracy at ε=0.10
+  "adv_acc_eps_0.06": [...],
+  "adv_acc_eps_0.10": [...],
   "adv_acc_eps_0.13": [...],
   "adv_acc_eps_0.16": [...],
   "adv_acc_eps_0.20": [...]
@@ -193,4 +193,3 @@ This creates:
   year={2024}
 }
 ```
-

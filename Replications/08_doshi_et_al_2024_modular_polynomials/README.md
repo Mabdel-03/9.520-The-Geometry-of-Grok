@@ -10,19 +10,19 @@ This paper extends analytical solutions for grokking to modular multiplication a
 
 ## Datasets
 
-- **Modular addition:** $(c_1n_1 + c_2n_2 + \cdots + c_Sn_S) \mod p$
-- **Modular multiplication:** $(n_1^a \times n_2^b) \mod p$ where $a, b \in \mathbb{Z}_p \setminus \{0\}$
-- **Primes used:** $p = 11, 23, 97$
+- **Modular addition:** (c_1 n_1 + c_2 n_2 + ... + c_S n_S) mod p
+- **Modular multiplication:** (n_1^a × n_2^b) mod p where a, b ∈ Z_p \ {0}
+- **Primes used:** p = 11, 23, 97
 - **Train/test split:** Typically 50/50
 
 ## Model Architecture
 
 **2-layer MLP with power activation:**
 - **Input:** One-hot encoded numbers
-- **First layer:** Embedding matrices $U^{(1)}, \ldots, U^{(S)} \in \mathbb{R}^{N \times p}$
-- **Activation:** $\phi(x) = x^S$ (element-wise power)
-- **Second layer:** Output matrix $W \in \mathbb{R}^{N \times p}$
-- **Output:** $f(e_{n_1}, \ldots, e_{n_S}) = W \cdot \phi(U^{(1)}e_{n_1} + \cdots + U^{(S)}e_{n_S})$
+- **First layer:** Embedding matrices U^{(1)}, ..., U^{(S)} ∈ ℝ^{N × p}
+- **Activation:** φ(x) = x^S (element-wise power)
+- **Second layer:** Output matrix W ∈ ℝ^{N × p}
+- **Output:** f(e_{n_1}, ..., e_{n_S}) = W · φ(U^{(1)} e_{n_1} + ... + U^{(S)} e_{n_S})
 
 ## Training Hyperparameters
 
@@ -30,7 +30,7 @@ This paper extends analytical solutions for grokking to modular multiplication a
 - **Learning rate:** 0.005
 - **Weight decay:** 5.0
 - **Loss function:** MSE loss
-- **Network width:** $N = 500$ (multiplication), $N = 5000$ (addition with many terms)
+- **Network width:** N = 500 (multiplication), N = 5000 (addition with many terms)
 
 ## Setup and Installation
 
@@ -110,4 +110,3 @@ python train.py \
   year={2024}
 }
 ```
-

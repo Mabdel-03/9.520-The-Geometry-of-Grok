@@ -10,7 +10,7 @@ This paper identifies an optimization anomaly in adaptive optimizers (Adam famil
 
 ## Dataset
 
-- **Task:** Modular addition $(a + b) \mod p$ for various primes
+- **Task:** Modular addition (a + b) mod p for various primes
 - **Training fraction:** Varied (typically 50%)
 - Focus on optimizer dynamics rather than specific dataset
 
@@ -25,7 +25,7 @@ This paper identifies an optimization anomaly in adaptive optimizers (Adam famil
 ## Training Hyperparameters
 
 - **Optimizer:** Adam or AdamW (focus on Adam family)
-- **Learning rate:** $10^{-3}$ to $10^{-4}$
+- **Learning rate:** 10^{-3} to 10^{-4}
 - **Weight decay:** Varied, including 0 (Slingshot can occur without explicit regularization)
 - **Batch size:** Full batch gradient descent
 - **Training:** Extended beyond overfitting to observe Slingshot cycles
@@ -112,4 +112,3 @@ plt.show()
   year={2022}
 }
 ```
-

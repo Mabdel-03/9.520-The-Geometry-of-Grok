@@ -65,7 +65,7 @@ python train_mnist.py --optimizer adamw --train_points 1000 --n_epochs 50000
 Shared training framework in [`framework/`](framework/):
 - `trainer.py` - Base training loop
 - `muon_official.py` - Muon optimizer
-- `spectral_metrics.py` - Optional parameter-gradient metrics (expensive!)
+- `spectral_metrics.py` - Optional parameter-gradient metrics (expensive)
 
 ---
 
@@ -116,7 +116,7 @@ results/
 - Replicating exact paper architectures
 - Want fastest training (no AGOP overhead)
 - Comparing optimizers only
-- Don't need mechanistic analysis
+- Do not need mechanistic analysis
 
 **Use agop_experiments when:**
 - Want to understand WHY grokking happens
@@ -126,6 +126,4 @@ results/
 
 ---
 
-**For most research: Use [`../agop_experiments/`](../agop_experiments/) - it provides much more insight!**
-
-
+**For most research: Use [`../agop_experiments/`](../agop_experiments/) - it provides much more insight.**

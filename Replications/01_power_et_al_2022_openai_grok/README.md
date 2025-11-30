@@ -10,6 +10,9 @@ This is the code for the paper [Grokking: Generalization Beyond Overfitting on S
 pip install -e .
 ./scripts/train.py
 ```
+
+---
+
 # Replication Guide: OpenAI Grok
 
 This directory contains the original OpenAI Grok repository for replicating the seminal grokking paper by Power et al. (2022).
@@ -104,4 +107,3 @@ See the original README.md for more details on the codebase structure.
   year={2022}
 }
 ```
-

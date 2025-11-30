@@ -111,7 +111,7 @@ squeue -u $USER
 ```bash
 cd analysis/
 
-# Visualize single experiment (creates 9 plots!)
+# Visualize single experiment (creates 9 plots)
 python visualize_agop_metrics.py \
     --results_dir ../results/agop_experiments/nanda/nanda_adamw_wd1.0_seed42
 
@@ -129,24 +129,24 @@ python compare_grok_nogrok.py \
 
 #### Generated Visualizations (Single Experiment)
 
-The visualization script now creates **9 comprehensive plots**:
+The visualization script creates **9 comprehensive plots**:
 
 1. **`training_curves.png`** - Standard train/test accuracy curves
 2. **`agop_basic_metrics.png`** - Frobenius norm, spectral radius, trace (3 panels)
 3. **`agop_collapse_metrics.png`** - Eigengap and variation collapse ratio (2 panels)
 4. **`agop_subspace_similarity.png`** - Top-k subspace stability over time
 5. **`combined_grokking_agop.png`** - 2×2 grid: test acc + key AGOP metrics
-6. **`comprehensive_timeline.png`** - **NEW!** 5-panel aligned timeline with grokking detection
-7. **`aligned_test_acc_vcr.png`** - **NEW!** Dual-axis: test acc + variation collapse ratio
-8. **`aligned_test_acc_eigengap.png`** - **NEW!** Dual-axis: test acc + eigengap
-9. **`aligned_test_acc_trace.png`** - **NEW!** Dual-axis: test acc + trace
-10. **`aligned_test_acc_spectral.png`** - **NEW!** Dual-axis: test acc + spectral radius
+6. **`comprehensive_timeline.png`** - 5-panel aligned timeline with grokking detection
+7. **`aligned_test_acc_vcr.png`** - Dual-axis: test acc + variation collapse ratio
+8. **`aligned_test_acc_eigengap.png`** - Dual-axis: test acc + eigengap
+9. **`aligned_test_acc_trace.png`** - Dual-axis: test acc + trace
+10. **`aligned_test_acc_spectral.png`** - Dual-axis: test acc + spectral radius
 
 **Key Features:**
-- 🎯 **Automatic grokking detection** and annotation on all plots
-- 📊 **Dual-axis plots** show exact correlation between test accuracy and AGOP metrics
-- 📈 **Comprehensive timeline** displays all metrics on shared x-axis with grokking marker
-- 🔍 **Smoothing** applied to reduce noise (configurable window size)
+- Automatic grokking detection and annotation on all plots
+- Dual-axis plots show exact correlation between test accuracy and AGOP metrics
+- Comprehensive timeline displays all metrics on shared x-axis with grokking marker
+- Smoothing applied to reduce noise (configurable window size)
 
 ## Experiment Matrix
 
@@ -158,7 +158,7 @@ Each dataset runs with:
 ### Expected Outcomes
 
 - **AdamW** with high weight decay: **Groks** (test acc → 99%)
-- **SGD** with high weight decay: **Doesn't grok** (test acc stays low)
+- **SGD** with high weight decay: **Does not grok** (test acc stays low)
 - **Muon**: **Varies** (interesting intermediate case)
 
 ## Key Questions to Answer
@@ -170,7 +170,7 @@ Each dataset runs with:
    - Hypothesis: VCR increases as gradients concentrate in top eigenvector
 
 3. **Are there different AGOP patterns for different optimizers?**
-   - Compare AdamW (groks) vs SGD (doesn't grok) vs Muon (?)
+   - Compare AdamW (groks) vs SGD (does not grok) vs Muon (?)
 
 4. **Do symbolic and perceptual tasks show different AGOP dynamics?**
    - Compare modular arithmetic (Nanda/Softmax) vs MNIST
@@ -279,7 +279,6 @@ For questions or issues, refer to the main optimizer experiments documentation a
 
 ---
 
-**Status**: Implementation complete ✓  
-**Last Updated**: Nov 2025  
+**Status**: Implementation complete  
+**Last Updated**: November 2024  
 **Maintainer**: Course project team
-

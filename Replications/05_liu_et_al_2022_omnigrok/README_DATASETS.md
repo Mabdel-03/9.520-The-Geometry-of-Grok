@@ -1,17 +1,17 @@
 # Dataset Downloads - Quick Reference
 
-## TL;DR
+## Summary
 
 **Can datasets be downloaded programmatically?**
 
-✅ **YES for 5/6 experiments** - Fully automatic  
-⚠️ **PARTIAL for 1/6 (IMDb)** - Requires Kaggle API setup
+**YES for 5/6 experiments** - Fully automatic  
+**PARTIAL for 1/6 (IMDb)** - Requires Kaggle API setup
 
 ---
 
 ## Quick Commands
 
-### Check What's Downloaded
+### Check What is Downloaded
 ```bash
 # MNIST (should auto-download)
 ls mnist/grokking/MNIST/
@@ -37,7 +37,7 @@ python scripts/download_imdb_dataset.py
 
 ---
 
-## What's Automatic
+## What is Automatic
 
 1. **MNIST** - Downloads automatically via PyTorch
 2. **QM9** - Downloads automatically via PyTorch Geometric  
@@ -71,4 +71,3 @@ sbatch scripts/run_imdb.sh
 See `DATASET_DOWNLOADS.md` for complete guide
 
 See `PAPER05_DATASET_AUTOMATION.md` for technical analysis
-

@@ -5,19 +5,19 @@ Comprehensive analysis tools for comparing optimizer and weight decay effects on
 ## Overview
 
 This analysis infrastructure provides:
-1. **Data loading and preprocessing utilities** (AGOP + Lazy-Rich metrics)
-2. **Statistical comparison functions**
-3. **Interactive Jupyter notebooks** for detailed analysis
-4. **Lazy-Rich dynamics visualization** (NTK distance, weight norms)
-5. **Automated figure generation**
+1. Data loading and preprocessing utilities (AGOP + Lazy-Rich metrics)
+2. Statistical comparison functions
+3. Interactive Jupyter notebooks for detailed analysis
+4. Lazy-Rich dynamics visualization (NTK distance, weight norms)
+5. Automated figure generation
 
-### New: Lazy-Rich Training Dynamics
+### Lazy-Rich Training Dynamics
 
-Based on Kumar et al. (2024) "Grokking as the Transition from Lazy to Rich Training Dynamics", this infrastructure now tracks:
+Based on Kumar et al. (2024) "Grokking as the Transition from Lazy to Rich Training Dynamics", this infrastructure tracks:
 - **NTK Distance**: How far the Neural Tangent Kernel has drifted from initialization
 - **Weight Norm Evolution**: Total and per-layer L2 norms during training
 - **Feature Kernel Distance**: How hidden representations change from initialization
-- **Transition Detection**: Automatic detection of lazy→rich transition epochs
+- **Transition Detection**: Automatic detection of lazy-to-rich transition epochs
 
 Reference: https://arxiv.org/abs/2310.06110
 
@@ -41,11 +41,11 @@ python3 test_basic_functionality.py
 ```
 
 This validates:
-- ✓ Experiments load correctly
-- ✓ Summary tables generate
-- ✓ Grokking classification works
-- ✓ Statistical functions available (if scipy installed)
-- ✓ Notebooks exist
+- Experiments load correctly
+- Summary tables generate
+- Grokking classification works
+- Statistical functions available (if scipy installed)
+- Notebooks exist
 
 ### 3. Run Analysis Notebooks
 
@@ -83,9 +83,9 @@ Then open:
   - `create_comparison_heatmap()` - Heatmap visualizations
   - `smooth_series()` - Moving average smoothing
   
-  **Lazy-Rich Functions (NEW):**
+  **Lazy-Rich Functions:**
   - `get_lazy_rich_metrics()` - Extract lazy-rich metrics from experiment
-  - `detect_lazy_rich_transition()` - Find lazy→rich transition epoch
+  - `detect_lazy_rich_transition()` - Find lazy-to-rich transition epoch
   - `compute_lazy_rich_summary()` - Summary statistics for NTK/weight norms
   - `plot_lazy_rich_dynamics()` - Plot NTK distance and weight norm evolution
   - `plot_transition_heatmap()` - Heatmap of transition characteristics
@@ -104,7 +104,7 @@ Then open:
 
 - **`analyze_softmax_experiments.ipynb`** (4.8 KB)
   - Same structure as Nanda
-  - Special focus on Muon breakthrough
+  - Special focus on Muon performance
   - 19 experiments analyzed
   - Higher grokking rate (37.5% vs 8.3%)
 
@@ -140,7 +140,7 @@ analysis/
 
 ### All Datasets
 - **Total experiments:** 72 directories created
-- **Complete with AGOP data:** 60/72 ✅
+- **Complete with AGOP data:** 60/72
 - **Analysis notebooks:** 3 comprehensive Jupyter notebooks
 
 ### Dataset-Specific Status
@@ -150,10 +150,10 @@ analysis/
 - **Composition:** 12 experiments (compositional reasoning)
 
 ### Key Findings from Completed Experiments
-1. **🎉 Major Discovery:** Muon groks on Softmax transformers with one-hot inputs!
-2. **Transformers >> MLPs:** ~2.4× better grokking rate across datasets
+1. **Notable Discovery:** Muon optimizer achieves grokking on Softmax transformers with one-hot inputs
+2. **Transformers outperform MLPs:** Approximately 2.4x better grokking rate across datasets
 3. **AdamW most reliable:** 75% success rate on transformer architectures
-4. **Softmax shows highest grokking rate:** ~47% vs ~20% for Nanda
+4. **Softmax shows highest grokking rate:** Approximately 47% vs 20% for Nanda
 5. **One-hot encoding matters:** Enables new optimizer behaviors (Muon success)
 
 ## Analysis Workflow
@@ -191,10 +191,10 @@ print(stats['interpretation'])
 ### In Jupyter Notebooks
 
 The notebooks provide:
-- **Interactive exploration** with pandas DataFrames
-- **Automated visualizations** (test accuracy curves, AGOP evolution)
-- **Statistical tests** with interpretation
-- **Publication-quality figures** saved to `figures/` directory
+- Interactive exploration with pandas DataFrames
+- Automated visualizations (test accuracy curves, AGOP evolution)
+- Statistical tests with interpretation
+- Publication-quality figures saved to `figures/` directory
 
 ## Metrics Analyzed
 
@@ -214,7 +214,7 @@ The notebooks provide:
 3. **Weight Norm Change:** Relative change from initialization
 4. **Weight Norm Ratio:** Final/initial weight norm
 5. **Feature Kernel Distance:** Hidden representation kernel distance
-6. **Transition Epoch:** Detected lazy→rich transition point
+6. **Transition Epoch:** Detected lazy-to-rich transition point
 
 ## Comparison Structure
 
@@ -274,8 +274,8 @@ pip install <package-name>
 ### No AGOP Data
 Some experiments may not have `agop_metrics.h5` files. The analysis will skip AGOP-specific analyses for these experiments but still process accuracy data.
 
-### Notebooks Won't Run
-Ensure you're in the correct directory and have Jupyter installed:
+### Notebooks Will Not Run
+Ensure you are in the correct directory and have Jupyter installed:
 ```bash
 pip install jupyter
 cd analysis/
@@ -319,4 +319,3 @@ For questions or issues:
 - New metrics: NTK distance, weight norm evolution, feature kernel distance
 - Updated analysis notebooks with lazy-rich visualization sections
 - New analysis functions: `plot_lazy_rich_dynamics()`, `correlate_agop_lazy_rich()`, etc.
-

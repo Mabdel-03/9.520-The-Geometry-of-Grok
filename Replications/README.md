@@ -16,14 +16,14 @@ The goal is to replicate these papers to:
 - **Paper:** [Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets](https://arxiv.org/abs/2201.02177)
 - **Datasets:** Modular arithmetic, permutation groups
 - **Architecture:** 2-layer transformer
-- **Status:** ✅ Cloned from GitHub
+- **Status:** Cloned from GitHub
 
 ### 2. Liu et al. (2022) - Effective Theory
 **Directory:** `02_liu_et_al_2022_effective_theory/`
 - **Paper:** [Towards Understanding Grokking: An Effective Theory of Representation Learning](https://arxiv.org/abs/2205.10343)
 - **Datasets:** Toy models, modular addition, S_3, MNIST
 - **Key Contribution:** Phase diagrams, Representation Quality Index
-- **Status:** ✅ Cloned from GitHub
+- **Status:** Cloned from GitHub
 
 ### 3. Nanda et al. (2023) - Mechanistic Interpretability
 **Directory:** `03_nanda_et_al_2023_progress_measures/`
@@ -31,21 +31,21 @@ The goal is to replicate these papers to:
 - **Dataset:** Modular addition (mod 113)
 - **Architecture:** 1-layer ReLU transformer
 - **Key Contribution:** Fourier multiplication algorithm discovery
-- **Status:** ✅ Implemented from scratch
+- **Status:** Implemented from scratch
 
 ### 4. Wang et al. (2024) - Implicit Reasoning
 **Directory:** `04_wang_et_al_2024_implicit_reasoners/`
 - **Paper:** [Grokked Transformers are Implicit Reasoners](https://arxiv.org/abs/2405.15071)
 - **Datasets:** Knowledge graph reasoning (composition, comparison)
 - **Architecture:** GPT-2 style transformer (8 layers)
-- **Status:** ✅ Cloned from GitHub
+- **Status:** Cloned from GitHub
 
 ### 5. Liu et al. (2022) - Omnigrok
 **Directory:** `05_liu_et_al_2022_omnigrok/`
 - **Paper:** [Omnigrok: Grokking Beyond Algorithmic Data](https://arxiv.org/abs/2210.01117)
 - **Datasets:** MNIST, IMDb, QM9, modular addition
 - **Key Contribution:** LU mechanism, extends grokking to diverse domains
-- **Status:** ✅ Cloned from GitHub
+- **Status:** Cloned from GitHub
 
 ### 6. Humayun et al. (2024) - Deep Networks Always Grok
 **Directory:** `06_humayun_et_al_2024_deep_networks/`
@@ -53,22 +53,22 @@ The goal is to replicate these papers to:
 - **Datasets:** MNIST, CIFAR-10/100, Imagenette, Shakespeare
 - **Architectures:** MLP, CNN, ResNet-18, GPT
 - **Key Contribution:** Delayed adversarial robustness, local complexity
-- **Status:** ✅ Implemented from scratch
+- **Status:** Implemented from scratch
 
 ### 7. Thilak et al. (2022) - Slingshot Mechanism
 **Directory:** `07_thilak_et_al_2022_slingshot/`
 - **Paper:** [The Slingshot Mechanism](https://arxiv.org/abs/2206.04817)
 - **Dataset:** Modular arithmetic
 - **Key Contribution:** Cyclic dynamics in Adam optimizers
-- **Status:** ✅ Implemented from scratch
+- **Status:** Implemented from scratch
 
 ### 8. Doshi et al. (2024) - Modular Polynomials
 **Directory:** `08_doshi_et_al_2024_modular_polynomials/`
 - **Paper:** [Grokking Modular Polynomials](https://arxiv.org/abs/2406.03495)
 - **Datasets:** Modular addition/multiplication with power activation
-- **Architecture:** 2-layer MLP with $\phi(x) = x^S$
+- **Architecture:** 2-layer MLP with φ(x) = x^S
 - **Key Contribution:** Analytical solutions for grokking
-- **Status:** ✅ Implemented from scratch
+- **Status:** Implemented from scratch
 
 ### 9. Levi et al. (2023) - Linear Estimators
 **Directory:** `09_levi_et_al_2023_linear_estimators/`
@@ -76,14 +76,14 @@ The goal is to replicate these papers to:
 - **Dataset:** Gaussian teacher-student
 - **Architecture:** Linear networks (1-layer, 2-layer)
 - **Key Contribution:** Grokking without understanding (threshold artifact)
-- **Status:** ✅ Implemented from scratch
+- **Status:** Implemented from scratch
 
 ### 10. Minegishi et al. (2023) - Grokking Tickets
 **Directory:** `10_minegishi_et_al_2023_grokking_tickets/`
 - **Paper:** [Grokking Tickets: Lottery Tickets Accelerate Grokking](https://arxiv.org/abs/2310.19470)
 - **Datasets:** Modular addition, MNIST
 - **Key Contribution:** Sparse subnetworks accelerate grokking
-- **Status:** ✅ Cloned from GitHub
+- **Status:** Cloned from GitHub
 
 ## Directory Structure
 
@@ -186,7 +186,7 @@ All implementations save model checkpoints regularly. To analyze gradient outer 
 
 1. **Load checkpoints** from different epochs (pre-grokking, during, post-grokking)
 2. **Compute gradients** on train/test batches
-3. **Form outer products** $\nabla \theta \nabla \theta^T$
+3. **Form outer products** ∇θ ∇θᵀ
 4. **Track evolution** of eigenvalues, eigenvectors, or other metrics
 
 Example analysis script structure:
@@ -235,4 +235,3 @@ If you use these replications, please cite the original papers (see individual R
 ## Contact
 
 For questions about this replication suite, refer to individual paper READMEs or the main project repository.
-

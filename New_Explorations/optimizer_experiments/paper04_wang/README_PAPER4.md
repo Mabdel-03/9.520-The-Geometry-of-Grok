@@ -11,10 +11,10 @@ Paper 4 uses a complex GPT-2 based architecture with custom simpletransformers m
 
 ## Current Status
 
-✓ Core framework (`GrokkingTrainer`) supports any PyTorch model  
-✓ Spectral metrics computation works with any architecture  
-✓ Optimizer framework ready (Muon, Adam, SGD)  
-⚠ Specific Wang et al. training script needs integration
+- Core framework (`GrokkingTrainer`) supports any PyTorch model  
+- Spectral metrics computation works with any architecture  
+- Optimizer framework ready (Muon, Adam, SGD)  
+- Specific Wang et al. training script needs integration
 
 ## Options for Integration
 
@@ -69,7 +69,7 @@ cd /om2/user/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/Replication
 
 ## Recommended Approach
 
-For your current needs (comparing optimizers on grokking tasks):
+For current needs (comparing optimizers on grokking tasks):
 
 **Papers 3 (Nanda) and 5 (Omnigrok) are sufficient because:**
 
@@ -93,7 +93,7 @@ For your current needs (comparing optimizers on grokking tasks):
 
 ## If You Need Paper 4 Later
 
-Contact me and I can:
+Contact the maintainer to:
 1. Create the simplified compositional model (Option 1) - ~2 hours
 2. Integrate full Wang et al. setup (Option 2) - ~2 days
 3. Add retroactive spectral analysis (Option 3) - ~4 hours
@@ -106,13 +106,12 @@ A minimal placeholder is provided in `train_composition_placeholder.py` showing 
 
 **Current framework is complete and functional for Papers 3 and 5.**
 
-These two papers give you:
-- ✓ Algorithmic + Visual domains
-- ✓ Transformer + MLP architectures
-- ✓ 3 optimizers × multiple weight decays
-- ✓ All requested spectral metrics
-- ✓ ~42 experiments total
-- ✓ Comprehensive analysis tools
+These two papers provide:
+- Algorithmic + Visual domains
+- Transformer + MLP architectures
+- 3 optimizers × multiple weight decays
+- All requested spectral metrics
+- ~42 experiments total
+- Comprehensive analysis tools
 
-This is sufficient for a thorough study of optimizer effects on grokking!
-
+This is sufficient for a thorough study of optimizer effects on grokking.

@@ -4,7 +4,7 @@ Clean, organized experiments for analyzing grokking phenomena with and without A
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
 ```
 New_Explorations/
@@ -13,7 +13,7 @@ New_Explorations/
 │   ├── framework/            # Shared training framework
 │   └── slurm_scripts/        # Batch job submission
 │
-├── agop_experiments/         # Experiments WITH AGOP tracking (tractable!)
+├── agop_experiments/         # Experiments WITH AGOP tracking (tractable)
 │   ├── core/                 # AGOP implementation (one-hot encoding)
 │   ├── training_scripts/     # Training with AGOP metrics
 │   ├── analysis/             # Visualization and comparison tools
@@ -25,7 +25,7 @@ New_Explorations/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Standard Experiments (No AGOP)
 
@@ -65,20 +65,20 @@ sbatch run_nanda_agop.sh
 
 ---
 
-## 🎯 Key Differences
+## Key Differences
 
 | Feature | Standard Experiments | AGOP Experiments |
 |---------|---------------------|------------------|
 | **Purpose** | Replicate papers, test optimizers | Mechanistic analysis of grokking |
 | **Architecture** | Original (transformers with embeddings) | One-hot encoded (MLP or Transformer) |
 | **Inputs** | Discrete tokens | Continuous one-hot vectors |
-| **AGOP Tracking** | ❌ No (or expensive parameter-gradient) | ✅ Yes (tractable input-gradient) |
+| **AGOP Tracking** | No (or expensive parameter-gradient) | Yes (tractable input-gradient) |
 | **Metrics** | Train/test accuracy, loss | + 19 AGOP metrics (eigengap, VCR, etc.) |
-| **Tractability** | N/A | ✅ Matrices <5 MB, compute in seconds |
+| **Tractability** | N/A | Matrices <5 MB, compute in seconds |
 
 ---
 
-## 📊 Datasets Available
+## Datasets Available
 
 Both experiment types support:
 
@@ -89,7 +89,7 @@ Both experiment types support:
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **This file** - Navigation and overview
 - [`standard_experiments/README.md`](standard_experiments/README.md) - Standard experiments guide
@@ -98,7 +98,7 @@ Both experiment types support:
 
 ---
 
-## ⚡ Recommended Workflow
+## Recommended Workflow
 
 ### 1. Start with AGOP Experiments (Most Valuable)
 
@@ -125,9 +125,9 @@ Run baseline experiments without AGOP overhead if needed for comparison.
 
 ---
 
-## 🔬 Research Questions
+## Research Questions
 
-The AGOP experiments enable you to answer:
+The AGOP experiments enable investigation of:
 
 1. **When does grokking happen?** (test accuracy transition)
 2. **What predicts grokking?** (AGOP metric signatures)
@@ -136,7 +136,7 @@ The AGOP experiments enable you to answer:
 
 ---
 
-## 💻 Requirements
+## Requirements
 
 - Python 3.10+
 - PyTorch 2.0+
@@ -146,7 +146,7 @@ The AGOP experiments enable you to answer:
 
 ---
 
-## 🆘 Support
+## Support
 
 - **Troubleshooting:** See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)
 - **AGOP Guide:** See [`docs/AGOP_GUIDE.md`](docs/AGOP_GUIDE.md)
@@ -154,5 +154,5 @@ The AGOP experiments enable you to answer:
 
 ---
 
-**Status:** ✅ Fully implemented and tested  
+**Status:** Fully implemented and tested  
 **Last Updated:** November 25, 2024

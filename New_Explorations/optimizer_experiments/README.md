@@ -407,8 +407,3 @@ To add a new dataset/paper:
 ## Contact
 
 For questions or issues, please refer to the main project repository.
-
----
-
-**Happy Grokking!** 🧠✨
-

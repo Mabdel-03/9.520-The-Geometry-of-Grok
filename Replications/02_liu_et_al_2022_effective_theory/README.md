@@ -90,7 +90,7 @@ batch_size = 45            # Full batch
 loss_type = "MSE"          # Mean squared error
 
 # Optimization
-eta_reprs = 1e-3          # Learning rate for representations (10x larger!)
+eta_reprs = 1e-3          # Learning rate for representations (10x larger)
 eta_dec = 1e-4            # Learning rate for decoder
 weight_decay_reprs = 0.0  # NO weight decay for representations
 weight_decay_dec = 0.0    # NO weight decay for decoder
@@ -100,7 +100,7 @@ optimizer = "AdamW"       # Adam with weight decay support
 ### Key Training Insights
 
 1. **Differential Learning Rates**: Representations learn 10× faster than decoder
-2. **No Weight Decay**: Unlike other grokking papers, this architecture doesn't require weight decay
+2. **No Weight Decay**: Unlike other grokking papers, this architecture does not require weight decay
 3. **Full Batch Training**: Uses all training samples in each step
 4. **Three-Stage Learning**: RQI improves → Train acc improves → Test acc improves
 
@@ -115,7 +115,7 @@ optimizer = "AdamW"       # Adam with weight decay support
 
 ### RQI Trajectory
 
-- **RQI threshold (0.95)** reached at: ~800 steps (before accuracy improves!)
+- **RQI threshold (0.95)** reached at: ~800 steps (before accuracy improves)
 - Shows representations develop structure before generalization
 - Final RQI: 1.0 (perfect parallelogram structure)
 
@@ -182,13 +182,13 @@ Each subdirectory contains:
 
 To verify successful replication:
 
-- ✅ Training runs without errors
-- ✅ Train accuracy reaches 90%+ 
-- ✅ Test accuracy reaches 90%+ after train accuracy
-- ✅ Grokking delay is 300-500 steps
-- ✅ Final performance is 100%/100%
-- ✅ RQI reaches 1.0
-- ✅ RQI improves before accuracy
+- Training runs without errors
+- Train accuracy reaches 90%+ 
+- Test accuracy reaches 90%+ after train accuracy
+- Grokking delay is 300-500 steps
+- Final performance is 100%/100%
+- RQI reaches 1.0
+- RQI improves before accuracy
 
 ## Citation
 
@@ -207,4 +207,3 @@ To verify successful replication:
 - The core training algorithm (`train_add.py`) is unchanged from the original
 - Results should closely match the paper's findings
 - For questions or issues, refer to the original repository or paper
-
