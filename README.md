@@ -2,7 +2,7 @@
 
 A comprehensive research project investigating the grokking phenomenon in neural networks through gradient outer product analysis.
 
-## 🎯 Project Goals
+## Project Goals
 
 Understanding the **geometry of grokking** by analyzing gradient outer products during the transition from memorization to generalization. We replicate 10 major grokking papers and track GOP dynamics across:
 - Different datasets (algorithmic, images, text, molecules, knowledge graphs)
@@ -10,7 +10,7 @@ Understanding the **geometry of grokking** by analyzing gradient outer products 
 - Different optimizers (Adam, AdamW, SGD)
 - Different weight decay settings (0 to 5.0)
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 9.520-The-Geometry-of-Grok/
@@ -31,7 +31,7 @@ Understanding the **geometry of grokking** by analyzing gradient outer products 
 │   └── 10_minegishi_et_al_2023_grokking_tickets/
 │
 └── New_Explorations/            # GOP analysis framework
-    ├── START_HERE.md            # 👈 Quick start guide
+    ├── START_HERE.md            # Quick start guide
     ├── framework/               # Core GOP tracking modules
     ├── configs/                 # Experiment configurations
     ├── experiments/             # Wrapped training scripts
@@ -39,7 +39,7 @@ Understanding the **geometry of grokking** by analyzing gradient outer products 
     └── results/                 # Experimental results (created at runtime)
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -91,7 +91,7 @@ cd New_Explorations
 python test_framework.py
 ```
 
-Expected output: `✅ All tests passed! Framework is ready to use.`
+Expected output: `All tests passed. Framework is ready to use.`
 
 ### Setup on Local Machine
 
@@ -109,7 +109,7 @@ cd New_Explorations
 pip install -r requirements.txt
 ```
 
-## 📚 Two Main Components
+## Two Main Components
 
 ### 1. Replications (Step 0)
 
@@ -117,7 +117,7 @@ pip install -r requirements.txt
 
 **Location:** `Replications/`
 
-**What's Included:**
+**What is Included:**
 - 7 cloned GitHub repositories from original papers
 - 3 implementations from scratch (for papers without code)
 - SLURM batch scripts for each experiment
@@ -132,14 +132,14 @@ pip install -r requirements.txt
 **Location:** `New_Explorations/`
 
 **What It Does:**
-- Computes gradient outer product G ⊗ G^T **every epoch**
+- Computes gradient outer product G ⊗ Gᵀ **every epoch**
 - Tracks eigenvalues, norms, rank, condition number
 - Stores everything in compressed HDF5 format
 - Provides visualization and analysis tools
 
 **Read:** `New_Explorations/START_HERE.md`
 
-## 🎯 Recommended Workflow
+## Recommended Workflow
 
 ### Phase 1: Testing (Local or HPC)
 
@@ -194,25 +194,25 @@ python
 ...     test_acc = f['test_acc'][:]
 ```
 
-## 📊 What You'll Track
+## Tracked Metrics
 
 ### Every Epoch:
-- ✅ Train/test loss and accuracy
-- ✅ Full gradient outer product matrix (M × M)
-- ✅ Per-layer GOP matrices
-- ✅ All eigenvalues + top-k eigenvectors
-- ✅ Trace, Frobenius norm, spectral norm, nuclear norm
-- ✅ Rank, condition number, determinant
-- ✅ Eigenvalue statistics
+- Train/test loss and accuracy
+- Full gradient outer product matrix (M × M)
+- Per-layer GOP matrices
+- All eigenvalues + top-k eigenvectors
+- Trace, Frobenius norm, spectral norm, nuclear norm
+- Rank, condition number, determinant
+- Eigenvalue statistics
 
 ### Storage Format:
 - `metrics.h5` - Scalar time series (~MB)
 - `gop_full.h5` - Full GOP matrices (~GB to ~TB)
 - `gop_layers.h5` - Per-layer GOPs (~GB)
 
-## 🔧 HPC-Specific Setup
+## HPC-Specific Setup
 
-All SLURM scripts are now configured to use your conda environment. They automatically:
+All SLURM scripts are configured to use the conda environment. They automatically:
 
 1. Source conda from your anaconda installation
 2. Activate the environment at `/om2/user/mabdel03/conda_envs/SLT_Proj_Env`
@@ -223,7 +223,7 @@ All SLURM scripts are now configured to use your conda environment. They automat
 - `module load cuda/11.8` - Your CUDA version
 - Time limits, memory, GPU requirements
 
-## 📖 Papers Replicated
+## Papers Replicated
 
 1. **Power et al. (2022)** - Original grokking paper (modular arithmetic)
 2. **Liu et al. (2022)** - Effective theory of representation learning
@@ -238,13 +238,13 @@ All SLURM scripts are now configured to use your conda environment. They automat
 
 See `Prior_Works.tex` for detailed literature review.
 
-## 💾 Storage Requirements
+## Storage Requirements
 
 ### With Full GOP Storage
 
 | Experiment | Parameters | Total Storage (Compressed) |
 |-----------|-----------|---------------------------|
-| Levi (linear) | 1K | ~16 GB ⭐ |
+| Levi (linear) | 1K | ~16 GB (recommended starting point) |
 | Doshi (poly) | 50K | ~50 GB |
 | Nanda (transformer) | 100K | ~160 GB |
 | Thilak (slingshot) | 150K | ~450 GB |
@@ -256,7 +256,7 @@ Set `store_full_gop: false` in config → **< 1 GB per experiment**
 
 Still tracks all eigenvalues and metrics, just not the full matrices.
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Out of Storage
 
@@ -285,16 +285,16 @@ gop_tracking:
   frequency: 100  # Track every 100 epochs
 ```
 
-## 📈 Expected Results
+## Expected Results
 
-After running experiments, you'll be able to:
+After running experiments, you will be able to:
 
 1. **Visualize eigenvalue spectrum evolution** during grokking
 2. **Identify GOP signatures** that predict generalization
 3. **Compare dynamics** across different setups
-4. **Understand the geometry** of the memorization → generalization transition
+4. **Understand the geometry** of the memorization to generalization transition
 
-## 🔬 Research Questions
+## Research Questions
 
 This framework enables investigating:
 
@@ -305,14 +305,14 @@ This framework enables investigating:
 - Are there universal GOP signatures of grokking?
 - Which layers contribute most to the transition?
 
-## 📚 Documentation
+## Documentation
 
 - **Replications:**
   - `Replications/README.md` - Overview of all 10 papers
   - Each paper directory has its own README
 
 - **GOP Framework:**
-  - `New_Explorations/START_HERE.md` - Quick start (read first!)
+  - `New_Explorations/START_HERE.md` - Quick start (read first)
   - `New_Explorations/GETTING_STARTED.md` - Tutorial
   - `New_Explorations/USAGE_GUIDE.md` - Detailed usage
   - `New_Explorations/IMPLEMENTATION_SUMMARY.md` - Technical details
@@ -320,7 +320,7 @@ This framework enables investigating:
 - **Literature:**
   - `Prior_Works.tex` - Comprehensive review of grokking papers
 
-## 🤝 Contributing
+## Contributing
 
 ### Adding New Experiments
 
@@ -335,7 +335,7 @@ This framework enables investigating:
 2. Or create new analysis scripts
 3. HDF5 files are easy to load and analyze
 
-## 📝 Citation
+## Citation
 
 If you use this code, please cite the original papers (see individual README files in `Replications/`) and this repository.
 
@@ -348,21 +348,21 @@ Key papers:
 - Liu et al. (2022) - Effective theory and Omnigrok
 - Nanda et al. (2023) - Mechanistic interpretability
 
-## 📧 Contact
+## Contact
 
-**Course:** MIT 9.520 - The Geometry of Grok  
+**Course:** MIT 9.520 - Statistical Learning Theory and Applications  
 **Repository:** https://github.com/Mabdel-03/9.520-The-Geometry-of-Grok
 
-## 🎓 Acknowledgments
+## Acknowledgments
 
-This project builds upon the excellent work of researchers who investigated grokking:
+This project builds upon the work of researchers who investigated grokking:
 - OpenAI (Power et al.)
 - MIT (Liu, Tegmark, Michaud et al.)
 - Anthropic (Nanda et al.)
 - OSU NLP Group (Wang et al.)
 - And all other authors listed in `Prior_Works.tex`
 
-## 📋 Quick Command Reference
+## Quick Command Reference
 
 ### Setup
 ```bash
@@ -395,14 +395,10 @@ cd New_Explorations/analysis
 python visualize_gop.py --results_dir ../results/09_levi_linear
 ```
 
-## 🎯 Start Here
+## Getting Started
 
 **New users:** Read `New_Explorations/START_HERE.md`
 
 **Want to replicate a paper:** Go to `Replications/` and choose a paper
 
 **Want to analyze GOPs:** Go to `New_Explorations/` and follow `GETTING_STARTED.md`
-
----
-
-**Let's understand the geometry of grokking! 🔬**
