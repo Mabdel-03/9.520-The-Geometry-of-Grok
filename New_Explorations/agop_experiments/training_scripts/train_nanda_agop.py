@@ -286,7 +286,7 @@ def main():
     lazy_rich_tracker.initialize(
         model, train_data,
         compute_ntk=compute_ntk,
-        compute_feature_kernel=compute_feature_kernel
+        compute_fk=compute_feature_kernel
     )
     
     # Save directory setup

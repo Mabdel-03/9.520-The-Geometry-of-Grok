@@ -374,7 +374,7 @@ class LazyRichTracker:
         model: nn.Module,
         data: torch.Tensor,
         compute_ntk: bool = True,
-        compute_feature_kernel: bool = True
+        compute_fk: bool = True
     ):
         """
         Store initial kernels before training begins.
@@ -383,7 +383,7 @@ class LazyRichTracker:
             model: Model at initialization
             data: Training data
             compute_ntk: Whether to compute NTK (expensive)
-            compute_feature_kernel: Whether to compute feature kernel (cheaper)
+            compute_fk: Whether to compute feature kernel (cheaper)
         """
         print("Initializing LazyRichTracker...")
         
@@ -418,7 +418,7 @@ class LazyRichTracker:
             print(f"||K₀||_F = {self.ntk_0_norm:.4e}")
         
         # Compute and store initial feature kernel
-        if compute_feature_kernel:
+        if compute_fk:
             print(f"  Computing initial feature kernel...", end=' ', flush=True)
             data_sub = data[self.subsample_indices]
             
