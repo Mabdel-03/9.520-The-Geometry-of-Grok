@@ -1,14 +1,25 @@
 # AGOP Experiments Analysis Infrastructure
 
-Comprehensive analysis tools for comparing optimizer and weight decay effects on grokking across all completed experiments (60+ with full AGOP metrics).
+Comprehensive analysis tools for comparing optimizer and weight decay effects on grokking across all completed experiments (60+ with full AGOP and Lazy-Rich metrics).
 
 ## Overview
 
 This analysis infrastructure provides:
-1. **Data loading and preprocessing utilities**
+1. **Data loading and preprocessing utilities** (AGOP + Lazy-Rich metrics)
 2. **Statistical comparison functions**
 3. **Interactive Jupyter notebooks** for detailed analysis
-4. **Automated figure generation**
+4. **Lazy-Rich dynamics visualization** (NTK distance, weight norms)
+5. **Automated figure generation**
+
+### New: Lazy-Rich Training Dynamics
+
+Based on Kumar et al. (2024) "Grokking as the Transition from Lazy to Rich Training Dynamics", this infrastructure now tracks:
+- **NTK Distance**: How far the Neural Tangent Kernel has drifted from initialization
+- **Weight Norm Evolution**: Total and per-layer L2 norms during training
+- **Feature Kernel Distance**: How hidden representations change from initialization
+- **Transition Detection**: Automatic detection of lazy→rich transition epochs
+
+Reference: https://arxiv.org/abs/2310.06110
 
 ## Quick Start
 
@@ -52,16 +63,34 @@ Then open:
 ### Core Utilities
 
 - **`analysis_utils.py`** - Main utility module with functions for:
-  - `load_all_experiments()` - Batch load experimental results
-  - `generate_summary_table()` - Create pandas DataFrame summaries
+
+  **Data Loading:**
+  - `load_all_experiments()` - Batch load experimental results (incl. lazy-rich metrics)
+  - `load_experiment()` - Load single experiment with AGOP + lazy-rich data
+  - `filter_experiments()` - Filter by config parameters
+  
+  **Grokking Analysis:**
   - `classify_grokking()` - Detect grokking (test acc > 95%)
   - `compute_time_to_grok()` - Find grokking epoch
+  - `generate_summary_table()` - Create pandas DataFrame summaries
+  
+  **Statistical Functions:**
   - `statistical_comparison()` - T-tests with effect sizes
-  - `filter_experiments()` - Filter by config parameters
-  - `smooth_series()` - Moving average smoothing
   - `compute_correlation()` - Pearson/Spearman correlations
+  
+  **AGOP Visualization:**
   - `plot_agop_comparison()` - Plot AGOP metrics across conditions
   - `create_comparison_heatmap()` - Heatmap visualizations
+  - `smooth_series()` - Moving average smoothing
+  
+  **Lazy-Rich Functions (NEW):**
+  - `get_lazy_rich_metrics()` - Extract lazy-rich metrics from experiment
+  - `detect_lazy_rich_transition()` - Find lazy→rich transition epoch
+  - `compute_lazy_rich_summary()` - Summary statistics for NTK/weight norms
+  - `plot_lazy_rich_dynamics()` - Plot NTK distance and weight norm evolution
+  - `plot_transition_heatmap()` - Heatmap of transition characteristics
+  - `correlate_agop_lazy_rich()` - Correlate AGOP with lazy-rich metrics
+  - `generate_lazy_rich_summary_table()` - DataFrame with lazy-rich metrics
 
 ### Analysis Notebooks
 
@@ -167,7 +196,9 @@ The notebooks provide:
 - **Statistical tests** with interpretation
 - **Publication-quality figures** saved to `figures/` directory
 
-## AGOP Metrics Analyzed
+## Metrics Analyzed
+
+### AGOP Metrics (Input-Gradient)
 
 1. **Variation Collapse Ratio (VCR):** λ₁ / Σλᵢ
 2. **Eigengap:** λ₁ - λ₂  
@@ -175,6 +206,15 @@ The notebooks provide:
 4. **Spectral Radius:** λ₁
 5. **Top Eigenvalue Energy**
 6. **Subspace Similarity**
+
+### Lazy-Rich Metrics (from Kumar et al. 2024)
+
+1. **NTK Distance:** ||Kₜ - K₀||_F / ||K₀||_F (normalized distance from initial kernel)
+2. **Weight Norm Total:** ||θₜ||₂ (total L2 norm of parameters)
+3. **Weight Norm Change:** Relative change from initialization
+4. **Weight Norm Ratio:** Final/initial weight norm
+5. **Feature Kernel Distance:** Hidden representation kernel distance
+6. **Transition Epoch:** Detected lazy→rich transition point
 
 ## Comparison Structure
 
@@ -255,6 +295,7 @@ Potential additions:
 
 - **AGOP Theory:** Beaglehole et al. "Average gradient outer product as a mechanism for deep neural collapse"
 - **Grokking:** Power et al. "Grokking: Generalization beyond overfitting on small algorithmic datasets"
+- **Lazy-Rich Dynamics:** Kumar et al. (2024) "Grokking as the Transition from Lazy to Rich Training Dynamics" - https://arxiv.org/abs/2310.06110
 - **Experimental Setup:** Based on Group1_Grokking_Code_Base.ipynb
 
 ## Support
@@ -268,8 +309,14 @@ For questions or issues:
 ---
 
 **Created:** November 26, 2024  
-**Last Updated:** November 28, 2024  
-**Analysis Infrastructure Version:** 1.1  
-**Total Experiments Available:** 60+ with complete AGOP metrics  
-**Analysis Tools:** 3 Jupyter notebooks, Python utilities, automated visualization pipeline
+**Last Updated:** November 30, 2024  
+**Analysis Infrastructure Version:** 2.0 (with Lazy-Rich Dynamics)
+**Total Experiments Available:** 60 with complete AGOP + Lazy-Rich metrics  
+**Analysis Tools:** 3 Jupyter notebooks with lazy-rich sections, Python utilities, automated visualization pipeline
+
+### Version 2.0 Changes
+- Added lazy-rich training dynamics tracking (Kumar et al. 2024)
+- New metrics: NTK distance, weight norm evolution, feature kernel distance
+- Updated analysis notebooks with lazy-rich visualization sections
+- New analysis functions: `plot_lazy_rich_dynamics()`, `correlate_agop_lazy_rich()`, etc.
 

@@ -1,12 +1,15 @@
 # AGOP-Tracking Experiments for Grokking Analysis
 
-This directory contains experiments that track **Input-Gradient AGOP (Average Gradient Outer Product)** metrics to analyze grokking mechanisms across different tasks and optimizers.
+This directory contains experiments that track **Input-Gradient AGOP (Average Gradient Outer Product)** metrics and **Lazy-Rich Training Dynamics** to analyze grokking mechanisms across different tasks and optimizers.
 
 ## Overview
 
-**Goal**: Understand what distinguishes grokking from non-grokking by tracking tractable AGOP metrics during training.
+**Goal**: Understand what distinguishes grokking from non-grokking by tracking tractable AGOP metrics and lazy-to-rich training dynamics during training.
 
-**Key Insight**: Instead of computing AGOP over parameters (expensive: 100K+ dimensions), we compute it over **inputs** (tractable: ~200-800 dimensions). This analyzes how the model's sensitivity to inputs evolves during grokking.
+**Key Insights**:
+1. **Input-Gradient AGOP**: Instead of computing AGOP over parameters (expensive: 100K+ dimensions), we compute it over **inputs** (tractable: ~200-800 dimensions). This analyzes how the model's sensitivity to inputs evolves during grokking.
+
+2. **Lazy-Rich Dynamics**: Based on Kumar et al. (2024), we track the transition from "lazy" training (network acts as kernel machine with fixed features) to "rich" training (active feature learning). This is measured via NTK distance from initialization.
 
 ## What is Input-Gradient AGOP?
 
@@ -19,6 +22,8 @@ Instead of gradients w.r.t. parameters ∇_θ L, we use gradients w.r.t. inputs 
 
 ## Metrics Tracked
 
+### AGOP Metrics (Input-Gradient)
+
 From the AGOP matrix, we compute:
 
 1. **Frobenius Norm** ||AGOP||_F - Overall magnitude
@@ -27,6 +32,19 @@ From the AGOP matrix, we compute:
 4. **Eigengap** (λ₁ - λ₂) - Gradient alignment measure
 5. **Variation Collapse Ratio** (λ₁/Σλᵢ) - Concentration measure
 6. **Top-k Subspace Similarity** - Stability of gradient directions
+
+### Lazy-Rich Metrics (from Kumar et al. 2024)
+
+Based on "Grokking as the Transition from Lazy to Rich Training Dynamics":
+
+1. **NTK Distance** ||Kₜ - K₀||_F / ||K₀||_F - Normalized distance from initial kernel
+2. **Weight Norm Evolution** ||θₜ||₂ - Total and per-layer L2 norms
+3. **Feature Kernel Distance** - Hidden layer representation changes
+4. **Transition Detection** - Automatic detection of lazy→rich transition epoch
+
+**Key Idea**: In the "lazy" regime, the NTK stays approximately constant (kernel regression with fixed features). When grokking occurs, the network transitions to "rich" training where the NTK evolves significantly (active feature learning).
+
+Reference: https://arxiv.org/abs/2310.06110
 
 ## Datasets
 
@@ -42,25 +60,36 @@ Experiments run on 4 datasets (in order):
 ```
 agop_experiments/
 ├── README.md                    # This file
-├── agop_utils.py               # Input-gradient AGOP tracker
-├── train_nanda_agop.py         # Training script for Nanda
-├── train_softmax_agop.py       # Training script for Softmax
-├── train_mnist_agop.py         # Training script for MNIST
-├── train_composition_agop.py   # Training script for Composition
+├── core/
+│   ├── agop_utils.py           # Input-gradient AGOP tracker
+│   ├── lazy_rich_utils.py      # Lazy-rich dynamics tracker (NTK, weight norms)
+│   ├── onehot_datasets.py      # One-hot encoded datasets
+│   └── onehot_models.py        # Models for one-hot inputs
+├── training_scripts/
+│   ├── train_nanda_agop.py     # Nanda with AGOP + lazy-rich tracking
+│   ├── train_softmax_agop.py   # Softmax with AGOP + lazy-rich tracking
+│   ├── train_mnist_agop.py     # MNIST with AGOP + lazy-rich tracking
+│   └── train_composition_agop.py
 ├── analysis/
-│   ├── visualize_agop_metrics.py   # Visualization
-│   └── compare_grok_nogrok.py      # Compare conditions
+│   ├── analysis_utils.py       # Analysis utilities (includes lazy-rich functions)
+│   ├── analyze_nanda_experiments.ipynb
+│   ├── analyze_softmax_experiments.ipynb
+│   ├── analyze_mnist_experiments.ipynb
+│   └── figures/                # Generated figures
 ├── configs/
 │   ├── nanda_agop.yaml
 │   ├── softmax_agop.yaml
 │   ├── mnist_agop.yaml
 │   └── composition_agop.yaml
+├── results/                    # Experiment outputs
+│   ├── nanda/
+│   ├── softmax/
+│   └── mnist/
 └── slurm_scripts/
-    ├── run_nanda_agop.sh
-    ├── run_softmax_agop.sh
-    ├── run_mnist_agop.sh
-    ├── run_composition_agop.sh
-    └── run_all_agop.sh
+    ├── run_nanda_full_sweep.sh
+    ├── run_softmax_full_sweep.sh
+    ├── run_mnist_full_sweep.sh
+    └── submit_all_lazy_rich.sh  # Submit all 60 experiments
 ```
 
 ## Quick Start
@@ -163,6 +192,7 @@ Each dataset runs with:
 
 ## Key Questions to Answer
 
+### AGOP Questions
 1. **Does eigengap collapse before grokking?**
    - Hypothesis: Eigengap should increase during grokking (gradient alignment)
 
@@ -175,17 +205,31 @@ Each dataset runs with:
 4. **Do symbolic and perceptual tasks show different AGOP dynamics?**
    - Compare modular arithmetic (Nanda/Softmax) vs MNIST
 
+### Lazy-Rich Questions (from Kumar et al.)
+5. **Does NTK distance spike correlate with grokking?**
+   - Hypothesis: Lazy→rich transition coincides with test accuracy improvement
+
+6. **Do different optimizers induce different transition speeds?**
+   - Compare how quickly each optimizer leaves the lazy regime
+
+7. **Does weight decay affect transition timing?**
+   - Hypothesis: Higher weight decay may accelerate feature learning
+
+8. **How do AGOP metrics relate to NTK distance?**
+   - Explore correlation between eigengap changes and lazy→rich transition
+
 ## Results Storage
 
 Results are saved as:
 ```
-results/agop_experiments/{dataset}/{experiment_name}/
+results/{dataset}/{experiment_name}/
 ├── config.json              # Experiment configuration
-├── training_history.json    # Train/test acc and loss
-└── agop_metrics.h5         # AGOP metrics (HDF5 for efficiency)
+├── training_history.json    # Train/test acc, loss, weight norms
+├── agop_metrics.h5         # AGOP metrics (HDF5)
+└── lazy_rich_metrics.h5    # Lazy-rich metrics (HDF5)
 ```
 
-AGOP metrics in HDF5 include:
+### AGOP metrics in HDF5 (`agop_metrics.h5`):
 - `epoch`: Epochs when AGOP was computed
 - `agop_frobenius`: Frobenius norm
 - `agop_spectral_radius`: λ₁
@@ -194,6 +238,15 @@ AGOP metrics in HDF5 include:
 - `agop_variation_collapse_ratio`: λ₁/Σλᵢ
 - `agop_topk_subspace_similarity`: Subspace stability
 - `agop_eigenvalue_1` through `agop_eigenvalue_10`: Top eigenvalues
+
+### Lazy-Rich metrics in HDF5 (`lazy_rich_metrics.h5`):
+- `epoch`: Epochs when metrics were computed
+- `ntk_distance`: ||Kₜ - K₀||_F / ||K₀||_F (normalized NTK distance)
+- `ntk_norm`: ||Kₜ||_F (current NTK norm)
+- `weight_norm_total`: Total L2 norm of all parameters
+- `weight_norm_change`: Relative change from initialization
+- `feature_kernel_distance`: Hidden representation kernel distance
+- `weight_norm_layer_*`: Per-layer weight norms
 
 ## Implementation Notes
 
@@ -231,6 +284,7 @@ The analysis scripts generate:
 
 - **AGOP Theory**: Beaglehole et al. "Average gradient outer product as a mechanism for deep neural collapse"
 - **Grokking**: Power et al. "Grokking: Generalization beyond overfitting on small algorithmic datasets"
+- **Lazy-Rich Dynamics**: Kumar et al. (2024) "Grokking as the Transition from Lazy to Rich Training Dynamics" - https://arxiv.org/abs/2310.06110
 - **Notebook Implementation**: `Group1_Grokking_Code_Base.ipynb` (Cells 4-9)
 
 ## Future Work
@@ -303,7 +357,15 @@ For detailed results, see:
 
 ---
 
-**Status**: Experiments complete, analysis in progress ✓  
-**Last Updated**: November 2025  
+**Status**: Experiments running with AGOP + Lazy-Rich tracking ✓  
+**Last Updated**: November 30, 2024  
+**Version**: 2.0 (with Lazy-Rich Dynamics from Kumar et al. 2024)
 **Maintainer**: Course project team
+
+### What's New in Version 2.0
+- **Lazy-Rich Dynamics**: Track NTK distance from initialization, weight norm evolution
+- **Feature Kernel Distance**: Monitor hidden representation changes
+- **Transition Detection**: Automatically detect lazy→rich transition epochs
+- **Updated Training Scripts**: All scripts now compute lazy-rich metrics alongside AGOP
+- **Updated Analysis Notebooks**: New visualization sections for lazy-rich analysis
 

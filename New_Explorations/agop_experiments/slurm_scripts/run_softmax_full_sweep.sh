@@ -38,6 +38,7 @@ echo "Architecture: $ARCHITECTURE"
 echo "Optimizer: $OPTIMIZER"
 echo "Weight Decay: $WEIGHT_DECAY"
 
+# Run training with AGOP + Lazy-Rich tracking
 $CONDA_ENV/bin/python ../training_scripts/train_softmax_agop.py \
     --architecture $ARCHITECTURE \
     --optimizer $OPTIMIZER \
@@ -48,6 +49,7 @@ $CONDA_ENV/bin/python ../training_scripts/train_softmax_agop.py \
     --n_epochs 50000 \
     --agop_freq 100 \
     --agop_top_k 20 \
+    --ntk_subsample 200 \
     --log_freq 100 \
     --device cuda \
     --seed 42 \

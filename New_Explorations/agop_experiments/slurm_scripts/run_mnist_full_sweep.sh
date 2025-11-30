@@ -33,6 +33,7 @@ echo "Running MNIST AGOP experiment - FULL SWEEP"
 echo "Optimizer: $OPTIMIZER"
 echo "Weight Decay: $WEIGHT_DECAY"
 
+# Run training with AGOP + Lazy-Rich tracking
 $CONDA_ENV/bin/python ../training_scripts/train_mnist_agop.py \
     --optimizer $OPTIMIZER \
     --weight_decay $WEIGHT_DECAY \
@@ -44,6 +45,7 @@ $CONDA_ENV/bin/python ../training_scripts/train_mnist_agop.py \
     --agop_freq 100 \
     --agop_subsample 500 \
     --agop_top_k 20 \
+    --ntk_subsample 200 \
     --log_freq 100 \
     --device cuda \
     --seed 42 \
