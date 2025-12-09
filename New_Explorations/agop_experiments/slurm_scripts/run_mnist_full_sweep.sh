@@ -15,7 +15,7 @@
 # Weight decays: 0.01, 0.1, 0.5, 1.0 (4)
 # Total: 1 × 3 × 4 = 12 jobs
 
-CONDA_ENV=/om/scratch/Tue/mabdel03/9.520/conda_envs/grok_exp
+CONDA_ENV=/om/scratch/Mon/mabdel03/9.520/conda_envs/grok_exp
 export PATH=$CONDA_ENV/bin:$PATH
 
 mkdir -p logs
