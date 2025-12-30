@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=icml_16runs
-#SBATCH --output=logs/icml_16runs_%A_%a.out
-#SBATCH --error=logs/icml_16runs_%A_%a.err
+#SBATCH --output=/om2/user/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/ICML_Submission/16_Runs/slurm_scripts/logs/icml_16runs_%A_%a.out
+#SBATCH --error=/om2/user/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/ICML_Submission/16_Runs/slurm_scripts/logs/icml_16runs_%A_%a.err
 #SBATCH --array=0-95
 #SBATCH --time=48:00:00
 #SBATCH --mem=96G
@@ -34,8 +34,11 @@
 CONDA_ENV=/om/scratch/Mon/mabdel03/9.520/conda_envs/grok_exp
 export PATH=$CONDA_ENV/bin:$PATH
 
+# Base directory (use absolute path for SLURM compatibility)
+BASE_DIR=/om2/user/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/ICML_Submission/16_Runs
+
 # Create logs directory if needed
-mkdir -p logs
+mkdir -p ${BASE_DIR}/slurm_scripts/logs
 
 # Define configuration arrays
 MODULI=(97 113)
@@ -93,11 +96,11 @@ echo ""
 echo "Experiment: p${MODULUS}_${ATTENTION_TYPE}_${LN_STR}_${OPTIMIZER}/wd${WEIGHT_DECAY}_seed42"
 echo "============================================================================"
 
-# Change to the training scripts directory
-cd "$(dirname "$0")/.."
+# Change to the base directory
+cd ${BASE_DIR}
 
 # Run training
-$CONDA_ENV/bin/python training_scripts/train_icml_16runs.py \
+$CONDA_ENV/bin/python ${BASE_DIR}/training_scripts/train_icml_16runs.py \
     --modulus $MODULUS \
     --attention_type $ATTENTION_TYPE \
     $LAYERNORM_FLAG \
@@ -113,10 +116,12 @@ $CONDA_ENV/bin/python training_scripts/train_icml_16runs.py \
     --agop_freq 100 \
     --agop_top_k 20 \
     --ntk_subsample 200 \
+    --no_ntk \
+    --no_feature_kernel \
     --log_freq 100 \
     --device cuda \
     --seed 42 \
-    --save_dir ./results
+    --save_dir ${BASE_DIR}/results
 
 EXIT_CODE=$?
 
