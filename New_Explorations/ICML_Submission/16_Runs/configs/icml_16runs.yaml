@@ -1,0 +1,175 @@
+# ICML 16_Runs Experiment Configuration
+# 
+# 16 base configurations (2x2x2x2) across 6 weight decay values = 96 total experiments
+#
+# Factors:
+#   - Modulus: 97, 113
+#   - Activation: softmax, relu  
+#   - LayerNorm: on, off
+#   - Optimizer: adam, muon
+#
+# Weight Decay Sweep: 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0
+
+# Experiment naming convention:
+# p{modulus}_{attention}_{ln/noln}_{optimizer}_wd{weight_decay}
+
+dataset:
+  train_fraction: 0.5  # 50% train, 50% test
+
+model:
+  d_model: 128
+  n_heads: 4
+  n_layers: 1
+  d_mlp: 512
+  dropout: 0.0
+
+training:
+  n_epochs: 50000
+  log_freq: 100
+  agop_freq: 100
+  device: cuda
+  seed: 42
+
+# Base configurations (16 total)
+base_configs:
+  # p=97 configurations (8)
+  - name: p97_softmax_ln_adam
+    modulus: 97
+    attention_type: softmax
+    use_layernorm: true
+    optimizer: adam
+    lr: 0.001
+
+  - name: p97_softmax_ln_muon
+    modulus: 97
+    attention_type: softmax
+    use_layernorm: true
+    optimizer: muon
+    lr: 0.001
+
+  - name: p97_softmax_noln_adam
+    modulus: 97
+    attention_type: softmax
+    use_layernorm: false
+    optimizer: adam
+    lr: 0.001
+
+  - name: p97_softmax_noln_muon
+    modulus: 97
+    attention_type: softmax
+    use_layernorm: false
+    optimizer: muon
+    lr: 0.001
+
+  - name: p97_relu_ln_adam
+    modulus: 97
+    attention_type: relu
+    use_layernorm: true
+    optimizer: adam
+    lr: 0.001
+
+  - name: p97_relu_ln_muon
+    modulus: 97
+    attention_type: relu
+    use_layernorm: true
+    optimizer: muon
+    lr: 0.001
+
+  - name: p97_relu_noln_adam
+    modulus: 97
+    attention_type: relu
+    use_layernorm: false
+    optimizer: adam
+    lr: 0.001
+
+  - name: p97_relu_noln_muon
+    modulus: 97
+    attention_type: relu
+    use_layernorm: false
+    optimizer: muon
+    lr: 0.001
+
+  # p=113 configurations (8)
+  - name: p113_softmax_ln_adam
+    modulus: 113
+    attention_type: softmax
+    use_layernorm: true
+    optimizer: adam
+    lr: 0.001
+
+  - name: p113_softmax_ln_muon
+    modulus: 113
+    attention_type: softmax
+    use_layernorm: true
+    optimizer: muon
+    lr: 0.001
+
+  - name: p113_softmax_noln_adam
+    modulus: 113
+    attention_type: softmax
+    use_layernorm: false
+    optimizer: adam
+    lr: 0.001
+
+  - name: p113_softmax_noln_muon
+    modulus: 113
+    attention_type: softmax
+    use_layernorm: false
+    optimizer: muon
+    lr: 0.001
+
+  - name: p113_relu_ln_adam
+    modulus: 113
+    attention_type: relu
+    use_layernorm: true
+    optimizer: adam
+    lr: 0.001
+
+  - name: p113_relu_ln_muon
+    modulus: 113
+    attention_type: relu
+    use_layernorm: true
+    optimizer: muon
+    lr: 0.001
+
+  - name: p113_relu_noln_adam
+    modulus: 113
+    attention_type: relu
+    use_layernorm: false
+    optimizer: adam
+    lr: 0.001
+
+  - name: p113_relu_noln_muon
+    modulus: 113
+    attention_type: relu
+    use_layernorm: false
+    optimizer: muon
+    lr: 0.001
+
+# Weight decay sweep values
+weight_decays:
+  - 0.00001   # 1e-5
+  - 0.0001    # 1e-4
+  - 0.001     # 1e-3
+  - 0.01      # 1e-2
+  - 0.1       # 1e-1
+  - 1.0       # 1
+
+# AGOP tracking configuration
+agop:
+  enabled: true
+  freq: 100
+  top_k: 20
+  subsample: null  # Use all training data
+
+# Lazy-Rich tracking configuration
+lazy_rich:
+  enabled: true
+  ntk_subsample: 200
+  compute_ntk: true
+  compute_feature_kernel: true
+
+# Output
+save:
+  base_dir: ./results
+
