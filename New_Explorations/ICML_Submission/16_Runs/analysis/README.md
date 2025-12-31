@@ -185,6 +185,56 @@ The complete grokking rate across all 96 experiments:
 
 ---
 
+## Controlled Comparison Analysis
+
+To isolate the causal effect of each factor, we compare conditions while holding all other factors constant.
+
+### Effect of LayerNorm (controlling for Activation, Optimizer, Modulus)
+
+For each combination of (Activation, Optimizer, Modulus), we compare LayerNorm ON vs OFF:
+
+![Controlled LayerNorm Comparison](figures/fig6a_controlled_layernorm.png)
+
+**Finding**: LayerNorm consistently improves grokking across almost all conditions, with the largest effects seen when combined with Adam optimizer.
+
+---
+
+### Effect of Activation (controlling for LayerNorm, Optimizer, Modulus)
+
+For each combination of (LayerNorm, Optimizer, Modulus), we compare ReLU vs Softmax attention:
+
+![Controlled Activation Comparison](figures/fig6b_controlled_activation.png)
+
+**Finding**: The effect of activation type is more context-dependent. Softmax tends to help with Muon optimizer, while the effect with Adam is mixed.
+
+---
+
+### Effect of Optimizer (controlling for LayerNorm, Activation, Modulus)
+
+For each combination of (LayerNorm, Activation, Modulus), we compare Adam vs Muon:
+
+![Controlled Optimizer Comparison](figures/fig6c_controlled_optimizer.png)
+
+**Finding**: Adam consistently outperforms Muon across all architectural configurations, with particularly large advantages when LayerNorm is disabled.
+
+---
+
+### Controlled Comparison Summary
+
+Distribution of factor effects across all control conditions:
+
+![Controlled Comparison Summary](figures/fig6d_controlled_summary.png)
+
+| Factor | Mean Effect | Positive Effect Rate |
+|--------|-------------|---------------------|
+| LayerNorm (ON vs OFF) | +35.4% | 100% (8/8 conditions) |
+| Softmax vs ReLU | +22.9% | 75% (6/8 conditions) |
+| Adam vs Muon | +35.4% | 100% (8/8 conditions) |
+
+**Key Insight**: LayerNorm and Adam optimizer show robust positive effects across all conditions, while the activation choice (Softmax vs ReLU) is more context-dependent.
+
+---
+
 ## Grokking Heatmaps by Configuration
 
 ### Modulus p=97
@@ -247,6 +297,10 @@ analysis/
     ├── fig4a_modulus_optimizer_layernorm.png
     ├── fig4b_modulus_wd_sensitivity.png
     ├── fig5_full_factorial_summary.png
+    ├── fig6a_controlled_layernorm.png      # NEW: Controlled comparison
+    ├── fig6b_controlled_activation.png     # NEW: Controlled comparison
+    ├── fig6c_controlled_optimizer.png      # NEW: Controlled comparison
+    ├── fig6d_controlled_summary.png        # NEW: Controlled comparison
     ├── grokking_heatmap_p97.png
     ├── grokking_heatmap_p113.png
     ├── agop_eigengap_evolution.png
