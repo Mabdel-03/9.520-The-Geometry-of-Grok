@@ -1,0 +1,199 @@
+# Power AGOP Study Configuration
+# 
+# Based on Power et al. (2022) "Grokking: Generalization Beyond Overfitting 
+# on Small Algorithmic Datasets"
+#
+# Investigates whether grokking corresponds to concentration of input-gradient
+# sensitivity, measured via AGOP eigenspectrum analysis (VCR).
+#
+# 48 total experiments = 2 (arch) × 2 (optimizer) × 2 (input) × 6 (weight decay)
+
+# ==============================================================================
+# Task: Modular Addition
+# ==============================================================================
+
+task:
+  operation: add
+  modulus: 97  # Prime number
+  description: "f(a, b) = (a + b) mod 97"
+
+# Dataset configuration
+dataset:
+  total_examples: 9409  # 97^2
+  train_fraction: 0.5   # 50% train (4704 examples)
+  test_fraction: 0.5    # 50% test (4705 examples)
+  split_method: random
+  seed: 42
+
+# ==============================================================================
+# Primary Experimental Factor: Weight Decay
+# ==============================================================================
+
+weight_decays:
+  - 0        # No regularization (non-grokking baseline, pure memorization)
+  - 0.0001   # 1e-4: Minimal regularization (late/rare grokking)
+  - 0.001    # 1e-3: Productive regime (reliable grokking)
+  - 0.01     # 1e-2: Productive regime (faster grokking)
+  - 0.1      # 1e-1: Productive regime (even faster)
+  - 1.0      # Strong regularization (testing upper limit)
+
+# Rationale:
+# - λ=0: Non-grokking baseline (pure memorization, no generalization)
+# - λ=1e-4: Minimal regularization (late/rare grokking expected)
+# - λ∈{1e-3, 1e-2, 1e-1}: Productive regime (reliable grokking with varying speed)
+# - λ=1.0: Strong regularization (testing upper limit, potential instability)
+
+# ==============================================================================
+# Architecture Configurations
+# ==============================================================================
+
+architectures:
+  transformer:
+    description: "Decoder-only Transformer (Power et al. style)"
+    type: decoder_only
+    input_format: "[tok_a, tok_b, tok_equals]"  # Sequence of 3 tokens
+    d_model: 128
+    n_layers: 2
+    n_heads: 4
+    d_head: 32  # d_model / n_heads
+    d_mlp: 512  # 4 * d_model
+    activation: gelu
+    positional_encoding: learned
+    normalization: pre_norm_layernorm
+    output: "linear from final token embedding to 97 logits"
+    approx_params: 400000
+
+  mlp:
+    description: "3-layer MLP baseline (minimal inductive bias)"
+    input_format: "[emb_a; emb_b] or [onehot_a; onehot_b]"
+    d_embed: 128
+    hidden_layers: [512, 512]
+    output_dim: 97
+    activation: relu
+    normalization: none
+    approx_params: 300000
+
+# Architecture rationale:
+# - Transformer has inductive bias (attention, positional encoding) toward structured tasks
+# - MLP is minimally biased
+# - If VCR spikes occur in both, this strengthens the invariance claim
+
+# ==============================================================================
+# Optimizer Configurations
+# ==============================================================================
+
+optimizers:
+  adamw:
+    type: AdamW
+    lr: 0.001
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    # weight_decay applied per experiment
+
+  muon:
+    type: Muon
+    lr: 0.001
+    momentum: 0.95
+    use_nesterov: true
+    # Newton-Schulz orthogonalization
+    # weight_decay applied per experiment
+
+# ==============================================================================
+# Input Representation
+# ==============================================================================
+
+input_types:
+  discrete:
+    description: "Discrete token indices embedded via learned embedding layer"
+    format: "integers a, b in {0, 1, ..., 96}"
+    embedding: "nn.Embedding(97, d_model)"
+    differentiable: false  # Embedding lookup not differentiable
+    
+  onehot:
+    description: "Continuous one-hot vectors (for AGOP computation)"
+    format: "97-dimensional one-hot for each of a and b, concatenated"
+    dimension: 194  # 2 * 97
+    differentiable: true  # Allows gradient computation w.r.t. inputs
+
+# Note: For AGOP computation, we always use the one-hot representation
+# to allow gradient computation with respect to inputs, regardless of
+# the input type used during training.
+
+# ==============================================================================
+# Training Configuration
+# ==============================================================================
+
+training:
+  n_epochs: 50000
+  batch_size: full  # Full batch (all training examples)
+  lr: 0.001
+  device: cuda
+  seed: 42
+  
+  logging:
+    freq: 100  # Log every 100 epochs
+    metrics: [train_loss, train_acc, test_loss, test_acc, weight_norm]
+
+# ==============================================================================
+# AGOP Tracking Configuration
+# ==============================================================================
+
+agop:
+  enabled: true
+  freq: 100  # Compute every 100 epochs
+  top_k: 20  # Track top 20 eigenvectors
+  subsample: null  # Use all training data (4704 examples)
+  
+  metrics:
+    primary:
+      - agop_variation_collapse_ratio  # VCR = λ₁/Σλᵢ (concentration measure)
+      
+    secondary:
+      - agop_trace                     # Σλᵢ (total variance)
+      - agop_eigengap                  # λ₁ - λ₂ (gradient alignment)
+      - agop_spectral_radius           # λ₁ (largest eigenvalue)
+      - agop_frobenius                 # ||AGOP||_F
+      
+    energy_concentration:
+      - agop_top5_energy_ratio         # Σᵢ₌₁⁵λᵢ / Σλ
+      - agop_top10_energy_ratio        # Σᵢ₌₁¹⁰λᵢ / Σλ
+      
+    eigenvalues:
+      - agop_eigenvalue_1 through agop_eigenvalue_10
+
+# ==============================================================================
+# Output Configuration
+# ==============================================================================
+
+output:
+  base_dir: ./results
+  
+  # Naming convention: {architecture}_{input_type}_{optimizer}/wd{weight_decay}_seed{seed}
+  # Example: transformer_discrete_adamw/wd0.01_seed42
+  
+  files:
+    - config.json           # Experiment configuration
+    - training_history.json # Train/test metrics over epochs
+    - agop_metrics.h5       # AGOP metrics in HDF5 format
+
+# ==============================================================================
+# Experiment Matrix
+# ==============================================================================
+
+# Total: 48 experiments
+# 
+# | ID | Architecture | Optimizer | Input    | Weight Decay |
+# |----|--------------|-----------|----------|--------------|
+# | 0  | transformer  | adamw     | discrete | 0            |
+# | 1  | transformer  | adamw     | discrete | 1e-4         |
+# | 2  | transformer  | adamw     | discrete | 1e-3         |
+# | 3  | transformer  | adamw     | discrete | 1e-2         |
+# | 4  | transformer  | adamw     | discrete | 1e-1         |
+# | 5  | transformer  | adamw     | discrete | 1.0          |
+# | 6  | transformer  | adamw     | onehot   | 0            |
+# | ...| ...          | ...       | ...      | ...          |
+# | 47 | mlp          | muon      | onehot   | 1.0          |
+
+# SLURM array mapping:
+# task_id = arch_idx * 24 + opt_idx * 12 + input_idx * 6 + wd_idx
+
