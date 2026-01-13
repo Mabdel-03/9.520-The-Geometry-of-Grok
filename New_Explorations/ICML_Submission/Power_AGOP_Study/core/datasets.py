@@ -31,7 +31,7 @@ def create_modular_dataset_discrete(
     
     Args:
         p: Modulus (prime number)
-        operation: 'add', 'sub', 'mul', or 'div'
+        operation: 'add', 'sub', 'mul', 'div', or 'cubic' (x³+xy)
         train_fraction: Fraction of data for training (default 0.5 = 50%)
         seed: Random seed for reproducibility
         device: Device to place tensors on
@@ -71,6 +71,9 @@ def create_modular_dataset_discrete(
                 label = (a * b) % p
             elif operation == 'div':
                 label = (a * mod_inverse(b, p)) % p
+            elif operation == 'cubic':
+                # x³ + xy mod p - more complex polynomial operation
+                label = (a**3 + a*b) % p
             else:
                 raise ValueError(f"Unknown operation: {operation}")
             
@@ -112,7 +115,7 @@ def create_modular_dataset_onehot(
     
     Args:
         p: Modulus (prime number)
-        operation: 'add', 'sub', 'mul', or 'div'
+        operation: 'add', 'sub', 'mul', 'div', or 'cubic' (x³+xy)
         train_fraction: Fraction of data for training (default 0.5 = 50%)
         seed: Random seed for reproducibility
         device: Device to place tensors on
@@ -156,6 +159,9 @@ def create_modular_dataset_onehot(
                 label = (a * b) % p
             elif operation == 'div':
                 label = (a * mod_inverse(b, p)) % p
+            elif operation == 'cubic':
+                # x³ + xy mod p - more complex polynomial operation
+                label = (a**3 + a*b) % p
             else:
                 raise ValueError(f"Unknown operation: {operation}")
             

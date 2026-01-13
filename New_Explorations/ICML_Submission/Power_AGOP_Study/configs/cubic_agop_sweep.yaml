@@ -1,0 +1,220 @@
+# Cubic Polynomial AGOP Study Configuration
+# 
+# Extension of Power AGOP Study with a more complex modular operation
+# that is hypothesized to NOT exhibit grokking.
+#
+# Research Question: What happens to AGOP metrics when grokking fails?
+# Hypothesis: The VCR spike associated with grokking will be absent,
+# providing a negative control for the VCR-grokking correlation.
+#
+# 48 total experiments = 2 (arch) × 2 (optimizer) × 2 (input) × 6 (weight decay)
+
+# ==============================================================================
+# Task: Cubic Polynomial Modular Arithmetic
+# ==============================================================================
+
+task:
+  operation: cubic
+  modulus: 97  # Prime number
+  description: "f(a, b) = (a³ + ab) mod 97"
+  
+  # Why this operation?
+  # - More complex than simple addition (x + y)
+  # - Involves higher-order polynomial terms
+  # - Less symmetric structure than basic operations
+  # - Expected to be harder (or impossible) to grok with these architectures
+  
+  comparison:
+    baseline: "f(a, b) = (a + b) mod 97"  # Original Power et al. task
+    this_study: "f(a, b) = (a³ + ab) mod 97"  # More complex polynomial
+
+# Dataset configuration (same as addition experiments for fair comparison)
+dataset:
+  total_examples: 9409  # 97^2
+  train_fraction: 0.5   # 50% train (4704 examples)
+  test_fraction: 0.5    # 50% test (4705 examples)
+  split_method: random
+  seed: 42  # Same seed as addition experiments
+
+# ==============================================================================
+# Primary Experimental Factor: Weight Decay
+# ==============================================================================
+
+weight_decays:
+  - 0        # No regularization
+  - 0.0001   # 1e-4: Minimal regularization
+  - 0.001    # 1e-3: Productive regime (for addition)
+  - 0.01     # 1e-2: Productive regime (for addition)
+  - 0.1      # 1e-1: Stronger regularization
+  - 1.0      # Strong regularization
+
+# Note: These are the same weight decays as the addition experiments.
+# For the cubic operation, we expect different behavior across all values.
+
+# ==============================================================================
+# Architecture Configurations (Same as addition experiments)
+# ==============================================================================
+
+architectures:
+  transformer:
+    description: "Decoder-only Transformer (Power et al. style)"
+    type: decoder_only
+    input_format: "[tok_a, tok_b, tok_equals]"
+    d_model: 128
+    n_layers: 2
+    n_heads: 4
+    d_head: 32
+    d_mlp: 512
+    activation: gelu
+    positional_encoding: learned
+    normalization: pre_norm_layernorm
+    output: "linear from final token embedding to 97 logits"
+    approx_params: 400000
+
+  mlp:
+    description: "3-layer MLP baseline"
+    input_format: "[emb_a; emb_b] or [onehot_a; onehot_b]"
+    d_embed: 128
+    hidden_layers: [512, 512]
+    output_dim: 97
+    activation: relu
+    normalization: none
+    approx_params: 300000
+
+# ==============================================================================
+# Optimizer Configurations (Same as addition experiments)
+# ==============================================================================
+
+optimizers:
+  adamw:
+    type: AdamW
+    lr: 0.001
+    betas: [0.9, 0.999]
+    eps: 1e-8
+
+  muon:
+    type: Muon
+    lr: 0.001
+    momentum: 0.95
+    use_nesterov: true
+
+# ==============================================================================
+# Input Representation (Same as addition experiments)
+# ==============================================================================
+
+input_types:
+  discrete:
+    description: "Discrete token indices embedded via learned embedding layer"
+    format: "integers a, b in {0, 1, ..., 96}"
+    embedding: "nn.Embedding(97, d_model)"
+    differentiable: false
+    
+  onehot:
+    description: "Continuous one-hot vectors (for AGOP computation)"
+    format: "97-dimensional one-hot for each of a and b, concatenated"
+    dimension: 194
+    differentiable: true
+
+# ==============================================================================
+# Training Configuration (Same as addition experiments)
+# ==============================================================================
+
+training:
+  n_epochs: 50000
+  batch_size: full
+  lr: 0.001
+  device: cuda
+  seed: 42
+  
+  logging:
+    freq: 100
+    metrics: [train_loss, train_acc, test_loss, test_acc, weight_norm]
+
+# ==============================================================================
+# AGOP Tracking Configuration (Same as addition experiments)
+# ==============================================================================
+
+agop:
+  enabled: true
+  freq: 100
+  top_k: 20
+  subsample: null
+  
+  metrics:
+    primary:
+      - agop_variation_collapse_ratio
+      
+    secondary:
+      - agop_trace
+      - agop_eigengap
+      - agop_spectral_radius
+      - agop_frobenius
+      
+    energy_concentration:
+      - agop_top5_energy_ratio
+      - agop_top10_energy_ratio
+
+# ==============================================================================
+# Output Configuration
+# ==============================================================================
+
+output:
+  base_dir: ./results_cubic  # Separate from addition results
+  
+  # Naming convention: {architecture}_{input_type}_{optimizer}/wd{weight_decay}_seed{seed}
+  # Example: transformer_discrete_adamw/wd0.01_seed42
+  
+  files:
+    - config.json
+    - training_history.json
+    - agop_metrics.h5
+
+# ==============================================================================
+# Experiment Matrix
+# ==============================================================================
+
+# Total: 48 experiments (same structure as addition experiments)
+# 
+# | ID | Architecture | Optimizer | Input    | Weight Decay |
+# |----|--------------|-----------|----------|--------------|
+# | 0  | transformer  | adamw     | discrete | 0            |
+# | 1  | transformer  | adamw     | discrete | 1e-4         |
+# | ...| ...          | ...       | ...      | ...          |
+# | 47 | mlp          | muon      | onehot   | 1.0          |
+
+# SLURM array mapping (same formula as addition):
+# task_id = arch_idx * 24 + opt_idx * 12 + input_idx * 6 + wd_idx
+
+# ==============================================================================
+# Expected Outcomes (Hypotheses)
+# ==============================================================================
+
+hypotheses:
+  grokking:
+    expectation: "Unlikely to occur"
+    rationale: "The cubic polynomial x³ + xy has more complex structure than x + y, making it harder for the model to discover the underlying algorithm."
+    
+  agop_vcr:
+    expectation: "No significant VCR spike"
+    rationale: "If VCR spikes are associated with grokking, and grokking doesn't occur, we expect stable/low VCR throughout training."
+    
+  training_dynamics:
+    expectation: "Possible memorization without generalization"
+    rationale: "Models may achieve high train accuracy but fail to generalize to test set."
+
+# ==============================================================================
+# Comparison with Addition Experiments
+# ==============================================================================
+
+comparison_analysis:
+  metrics_to_compare:
+    - final_test_accuracy
+    - grok_epoch (if any)
+    - vcr_at_train_convergence
+    - vcr_max
+    - vcr_trajectory_shape
+    
+  key_questions:
+    - "Does VCR spike occur only when grokking occurs?"
+    - "What is the AGOP eigenspectrum like for non-grokking tasks?"
+    - "Is there a relationship between task complexity and VCR behavior?"

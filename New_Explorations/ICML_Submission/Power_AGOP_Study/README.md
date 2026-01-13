@@ -18,7 +18,20 @@ Where $\lambda_i$ are the eigenvalues of the AGOP matrix. A higher VCR indicates
 
 ---
 
-## Task: Modular Addition
+## Tasks
+
+This study includes two modular arithmetic tasks:
+
+| Task | Operation | Description | Expected Behavior |
+|------|-----------|-------------|-------------------|
+| **Addition** | $f(a, b) = (a + b) \mod 97$ | Original Power et al. task | Grokking expected |
+| **Cubic Polynomial** | $f(a, b) = (a^3 + ab) \mod 97$ | More complex polynomial | Grokking unlikely |
+
+The cubic polynomial task serves as a **negative control** to test whether VCR spikes are specifically associated with grokking, or occur in all training scenarios.
+
+---
+
+## Task 1: Modular Addition
 
 **Operation:** $f(a, b) = (a + b) \mod p$
 
@@ -79,6 +92,36 @@ A minimal architecture with no inductive biases, serving as a baseline.
 | **Total parameters** | ~300,000 |
 
 **Rationale:** If VCR spikes occur in both transformer and MLP, this strengthens the claim that gradient concentration is an invariant property of grokking, independent of architectural inductive biases.
+
+---
+
+## Task 2: Cubic Polynomial (Negative Control)
+
+**Operation:** $f(a, b) = (a^3 + ab) \mod p$
+
+**Modulus:** $p = 97$ (prime)
+
+### Dataset
+Same structure as modular addition:
+| Property | Value |
+|----------|-------|
+| Total examples | $97^2 = 9409$ |
+| Train split | 50% (4,704 examples) |
+| Test split | 50% (4,705 examples) |
+| Split method | Random (seed=42) |
+
+### Motivation
+The cubic polynomial is more complex than simple addition:
+- Involves higher-order polynomial terms ($a^3$)
+- Includes a cross-term ($ab$)
+- Less symmetric structure than basic operations
+
+**Hypothesis:** This task is unlikely to exhibit grokking with the current architectures and hyperparameters, providing a control condition to validate that VCR spikes are specific to successful generalization.
+
+### Expected Outcomes
+- **No grokking:** Models may memorize training data but fail to generalize
+- **No VCR spike:** If VCR spikes correlate with grokking, they should be absent here
+- **Comparison:** Analyzing AGOP behavior in grokking vs. non-grokking scenarios
 
 ---
 
@@ -159,7 +202,10 @@ The Average Gradient Outer Product captures how the model's output sensitivity v
 
 ## Experiment Matrix
 
-**Total: 48 experiments** = 2 (architectures) × 2 (optimizers) × 2 (input types) × 6 (weight decays)
+**Total: 96 experiments** = 2 (tasks) × 2 (architectures) × 2 (optimizers) × 2 (input types) × 6 (weight decays)
+
+- **48 experiments** for modular addition (original)
+- **48 experiments** for cubic polynomial (negative control)
 
 ### SLURM Array Task Mapping
 
@@ -188,20 +234,28 @@ Within each range, weight decay varies: `[0, 1e-4, 1e-3, 1e-2, 1e-1, 1.0]`
 Power_AGOP_Study/
 ├── README.md                    # This file
 ├── configs/
-│   └── power_agop_sweep.yaml   # Full experiment configuration
+│   ├── power_agop_sweep.yaml   # Addition experiment configuration
+│   └── cubic_agop_sweep.yaml   # Cubic polynomial experiment configuration
 ├── core/
 │   ├── __init__.py
 │   ├── power_transformer.py    # Decoder-only transformer implementation
 │   ├── grokking_mlp.py         # MLP baseline implementation
-│   ├── datasets.py             # Modular arithmetic dataset
+│   ├── datasets.py             # Modular arithmetic dataset (add, cubic, etc.)
 │   ├── agop_utils.py           # AGOP computation utilities
 │   └── lazy_rich_utils.py      # Training dynamics utilities
 ├── training_scripts/
-│   └── train_power_agop.py     # Main training script
+│   └── train_power_agop.py     # Main training script (supports --operation)
 ├── slurm_scripts/
-│   ├── run_power_sweep.sh      # SLURM array job script
+│   ├── run_power_sweep.sh      # SLURM array job for addition (48 experiments)
+│   ├── run_cubic_sweep.sh      # SLURM array job for cubic (48 experiments)
 │   └── logs/                   # Job output logs
-└── results/                    # Experiment outputs
+├── results/                    # Addition experiment outputs
+│   └── {arch}_{input}_{opt}/
+│       └── wd{weight_decay}_seed{seed}/
+│           ├── config.json
+│           ├── training_history.json
+│           └── agop_metrics.h5
+└── results_cubic/              # Cubic polynomial experiment outputs
     └── {arch}_{input}_{opt}/
         └── wd{weight_decay}_seed{seed}/
             ├── config.json
@@ -213,23 +267,32 @@ Power_AGOP_Study/
 
 ## Running Experiments
 
-### Submit All 48 Experiments
+### Submit All Addition Experiments (48 jobs)
 ```bash
 cd slurm_scripts
 sbatch run_power_sweep.sh
 ```
 
+### Submit All Cubic Polynomial Experiments (48 jobs)
+```bash
+cd slurm_scripts
+sbatch run_cubic_sweep.sh
+```
+
 ### Submit Specific Tasks
 ```bash
 # Run only transformer + adamw + discrete experiments (tasks 0-5)
-sbatch --array=0-5 run_power_sweep.sh
+sbatch --array=0-5 run_power_sweep.sh   # Addition
+sbatch --array=0-5 run_cubic_sweep.sh   # Cubic
 
 # Run a single experiment
-sbatch --array=3 run_power_sweep.sh  # transformer_discrete_adamw, wd=1e-2
+sbatch --array=3 run_power_sweep.sh  # transformer_discrete_adamw, wd=1e-2, addition
+sbatch --array=3 run_cubic_sweep.sh  # transformer_discrete_adamw, wd=1e-2, cubic
 ```
 
 ### Run Single Experiment Manually
 ```bash
+# Addition (default)
 python training_scripts/train_power_agop.py \
     --architecture transformer \
     --input_type discrete \
@@ -237,6 +300,17 @@ python training_scripts/train_power_agop.py \
     --weight_decay 0.01 \
     --n_epochs 50000 \
     --seed 42
+
+# Cubic polynomial
+python training_scripts/train_power_agop.py \
+    --operation cubic \
+    --architecture transformer \
+    --input_type discrete \
+    --optimizer adamw \
+    --weight_decay 0.01 \
+    --n_epochs 50000 \
+    --seed 42 \
+    --save_dir ./results_cubic
 ```
 
 ---
@@ -265,9 +339,25 @@ HDF5 file containing AGOP eigenvalues and metrics at each checkpoint:
 
 ---
 
+## Experiment Status
+
+### Modular Addition Experiments (Complete)
+- **Job ID:** 44540373
+- **Status:** Completed
+- **Results:** Available in `results/`
+
+### Cubic Polynomial Experiments (Running)
+- **Job ID:** 44559114
+- **Status:** In progress (started January 12, 2026)
+- **Results:** Saving to `results_cubic/`
+
+---
+
 ## Early Results (Preliminary)
 
-From ongoing experiments on transformer + AdamW + discrete:
+### Modular Addition Results
+
+From completed experiments on transformer + AdamW + discrete:
 
 | Weight Decay | VCR at ~33K epochs | Observation |
 |--------------|-------------------|-------------|
@@ -281,6 +371,36 @@ From ongoing experiments on transformer + AdamW + discrete:
 **Key Finding:** Weight decay = 1e-2 produces the highest VCR, suggesting an optimal regularization strength for gradient concentration.
 
 **Muon vs AdamW:** Muon optimizer shows consistently lower VCR (~0.04) compared to AdamW (~0.13-0.53), indicating fundamentally different gradient geometry.
+
+### Cubic Polynomial Results (Preliminary)
+
+Early observations from running experiments (epoch ~300):
+
+| Configuration | Train Acc | Test Acc | VCR | Observation |
+|--------------|-----------|----------|-----|-------------|
+| transformer_discrete_adamw, wd=0 | ~1.0% | ~1.9% | ~0.05-0.06 | Low accuracy, low VCR |
+
+**Early Indication:** As hypothesized, the cubic polynomial task shows:
+- Very low test accuracy (near random chance)
+- Low, stable VCR without the spike seen in addition experiments
+- This supports the hypothesis that VCR concentration is specific to grokking
+
+---
+
+## Comparing Addition vs. Cubic Experiments
+
+The key analysis will compare AGOP metrics between the two tasks:
+
+| Metric | Addition (Grokking) | Cubic (No Grokking) |
+|--------|---------------------|---------------------|
+| Final Test Accuracy | Expected: >95% | Expected: ~50% (random) |
+| VCR Spike | Expected: Yes | Expected: No |
+| AGOP Eigenspectrum | Concentrated | Diffuse |
+
+**Key Questions:**
+1. Does VCR spike occur only when grokking occurs?
+2. What is the AGOP eigenspectrum like for non-grokking tasks?
+3. Is there a relationship between task complexity and VCR behavior?
 
 ---
 

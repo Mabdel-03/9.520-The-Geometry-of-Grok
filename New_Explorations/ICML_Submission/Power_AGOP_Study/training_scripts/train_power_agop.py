@@ -213,7 +213,10 @@ def main():
     
     # Dataset arguments
     parser.add_argument('--modulus', '-p', type=int, default=97,
-                       help='Modulus for modular addition')
+                       help='Modulus for modular arithmetic')
+    parser.add_argument('--operation', type=str, default='add',
+                       choices=['add', 'sub', 'mul', 'div', 'cubic'],
+                       help='Modular operation: add (x+y), sub (x-y), mul (x*y), div (x/y), cubic (x^3+xy)')
     parser.add_argument('--train_fraction', type=float, default=0.5, 
                        help='Fraction of data for training (0.5 means 50 percent)')
     
@@ -280,10 +283,22 @@ def main():
             f'wd{args.weight_decay}_seed{args.seed}'
         )
     
+    # Get operation description for logging
+    op_descriptions = {
+        'add': 'x + y',
+        'sub': 'x - y', 
+        'mul': 'x * y',
+        'div': 'x / y',
+        'cubic': 'x³ + xy'
+    }
+    op_desc = op_descriptions.get(args.operation, args.operation)
+    
     print("=" * 80)
     print("Power AGOP Study: Grokking Experiments")
     print("=" * 80)
     print(f"Configuration:")
+    print(f"  Task: ({op_desc}) mod {args.modulus}")
+    print(f"  Operation: {args.operation}")
     print(f"  Modulus: p={args.modulus}")
     print(f"  Architecture: {args.architecture}")
     print(f"  Input type: {args.input_type}")
@@ -300,7 +315,7 @@ def main():
     # Create dataset
     dataset = ModularArithmeticDataset(
         p=args.modulus,
-        operation='add',
+        operation=args.operation,
         train_fraction=args.train_fraction,
         seed=args.seed,
         device=device
