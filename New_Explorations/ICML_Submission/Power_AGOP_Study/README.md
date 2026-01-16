@@ -381,6 +381,8 @@ The cubic polynomial experiments revealed that:
 - The cubic task achieves similar VCR values to the addition task
 - This suggests VCR measures gradient geometry, not learning success
 
+![Key Finding: VCR is Not Sufficient](analysis/figures/fig_comp3_key_finding.png)
+
 ---
 
 ## Generated Figures
@@ -468,7 +470,9 @@ Direct comparisons between addition (grokking) and cubic (non-grokking) tasks:
 
 ### Example: Transformer + AdamW + Discrete Comparison
 
-This figure shows the clearest contrast between grokking and non-grokking scenarios. See `analysis/figures/fig_comparison_grid_transformer_adamw_discrete.pdf`.
+This figure shows the clearest contrast between grokking and non-grokking scenarios:
+
+![Comparison Grid: Transformer + AdamW + Discrete](analysis/figures/fig_comparison_grid_transformer_adamw_discrete.png)
 
 **Observations:**
 - **Left column (Addition):** VCR spikes at wd=1e-2 and 1e-1 coincide with sharp increases in test accuracy (grokking)
@@ -477,9 +481,17 @@ This figure shows the clearest contrast between grokking and non-grokking scenar
 
 ### Example: Key Finding Visualization
 
-See `analysis/figures/fig_comp3_key_finding.pdf` for the visualization.
+![Key Finding: VCR is Not Sufficient for Grokking](analysis/figures/fig_comp3_key_finding.png)
 
 This figure directly compares VCR trajectories between grokking (addition) and non-grokking (cubic) experiments, demonstrating that high VCR values do not guarantee generalization.
+
+### VCR Trajectories: Addition vs Cubic Side-by-Side
+
+![VCR Trajectories Comparison](analysis/figures/fig_comp1_vcr_side_by_side.png)
+
+### VCR Distributions by Task and Outcome
+
+![VCR Distributions](analysis/figures/fig_comp2_vcr_distributions.png)
 
 ---
 

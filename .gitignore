@@ -59,6 +59,9 @@ data/imagenette2-320/
 *.bmp
 *.tiff
 
+# Exception: Allow analysis figures
+!**/analysis/figures/*.png
+
 # Temporary files
 *.tmp
 *.swp
