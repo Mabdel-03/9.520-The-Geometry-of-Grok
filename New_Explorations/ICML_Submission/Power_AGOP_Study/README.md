@@ -343,64 +343,176 @@ HDF5 file containing AGOP eigenvalues and metrics at each checkpoint:
 
 ### Modular Addition Experiments (Complete)
 - **Job ID:** 44540373
-- **Status:** Completed
+- **Status:** ✅ Completed
 - **Results:** Available in `results/`
 
-### Cubic Polynomial Experiments (Running)
+### Cubic Polynomial Experiments (Complete)
 - **Job ID:** 44559114
-- **Status:** In progress (started January 12, 2026)
-- **Results:** Saving to `results_cubic/`
+- **Status:** ✅ Completed (January 2026)
+- **Results:** Available in `results_cubic/`
+
+### Analysis (Complete)
+- **Notebook:** `analysis/analyze_power_agop.ipynb`
+- **Figures:** `analysis/figures/` (30+ figures in PNG and PDF formats)
+- **Data Exports:** `analysis/figures/experiment_summary_*.csv`
 
 ---
 
-## Early Results (Preliminary)
+## Experiment Results and Analysis
 
-### Modular Addition Results
+All 96 experiments (48 addition + 48 cubic) have been completed. The analysis notebook (`analysis/analyze_power_agop.ipynb`) contains comprehensive visualizations and statistical analysis.
 
-From completed experiments on transformer + AdamW + discrete:
+### Key Findings
 
-| Weight Decay | VCR at ~33K epochs | Observation |
-|--------------|-------------------|-------------|
-| 0 | ~0.13 | Low concentration |
-| 1e-4 | ~0.13 | Similar to wd=0 |
-| 1e-3 | ~0.30 | Moderate concentration |
-| **1e-2** | **~0.53** | **Highest concentration** |
-| 1e-1 | ~0.26 | Decreasing |
-| 1.0 | ~0.24 | Stable |
+#### 1. Modular Addition (Grokking Task)
+- **Grokking Rate:** High with appropriate weight decay (1e-2 to 1e-1)
+- **VCR Behavior:** Strong VCR spikes (>0.5) precede or coincide with generalization
+- **Weight Decay Sweet Spot:** wd=1e-2 produces reliable grokking with highest VCR concentration
 
-**Key Finding:** Weight decay = 1e-2 produces the highest VCR, suggesting an optimal regularization strength for gradient concentration.
+#### 2. Cubic Polynomial (Non-Grokking Control)
+- **Grokking Rate:** 0% - no experiments generalized beyond training data
+- **Unexpected Finding:** VCR spikes still occur (~0.5-0.7) despite no generalization
+- **Implication:** VCR concentration is **not sufficient** for grokking
 
-**Muon vs AdamW:** Muon optimizer shows consistently lower VCR (~0.04) compared to AdamW (~0.13-0.53), indicating fundamentally different gradient geometry.
+#### 3. Critical Insight: VCR is Necessary but Not Sufficient
 
-### Cubic Polynomial Results (Preliminary)
-
-Early observations from running experiments (epoch ~300):
-
-| Configuration | Train Acc | Test Acc | VCR | Observation |
-|--------------|-----------|----------|-----|-------------|
-| transformer_discrete_adamw, wd=0 | ~1.0% | ~1.9% | ~0.05-0.06 | Low accuracy, low VCR |
-
-**Early Indication:** As hypothesized, the cubic polynomial task shows:
-- Very low test accuracy (near random chance)
-- Low, stable VCR without the spike seen in addition experiments
-- This supports the hypothesis that VCR concentration is specific to grokking
+The cubic polynomial experiments revealed that:
+- High VCR concentration can occur without generalization
+- The cubic task achieves similar VCR values to the addition task
+- This suggests VCR measures gradient geometry, not learning success
 
 ---
 
-## Comparing Addition vs. Cubic Experiments
+## Generated Figures
 
-The key analysis will compare AGOP metrics between the two tasks:
+All figures are saved in `analysis/figures/` in both PNG and PDF formats.
 
-| Metric | Addition (Grokking) | Cubic (No Grokking) |
-|--------|---------------------|---------------------|
-| Final Test Accuracy | Expected: >95% | Expected: ~50% (random) |
-| VCR Spike | Expected: Yes | Expected: No |
-| AGOP Eigenspectrum | Concentrated | Diffuse |
+### Main Figures (Modular Addition)
 
-**Key Questions:**
-1. Does VCR spike occur only when grokking occurs?
-2. What is the AGOP eigenspectrum like for non-grokking tasks?
-3. Is there a relationship between task complexity and VCR behavior?
+| Figure | Filename | Description |
+|--------|----------|-------------|
+| Fig 1 | `fig1_agop_schematic` | AGOP conceptual diagram |
+| Fig 2 | `fig2_vcr_trajectories_weight_decay` | VCR trajectories across weight decays |
+| Fig 3 | `fig3_vcr_generalization_alignment` | VCR vs generalization timing |
+| Fig 4 | `fig4_weight_decay_phase_diagram` | Phase diagram of grokking regimes |
+| Fig 5 | `fig5_architecture_comparison` | Transformer vs MLP comparison |
+| Fig 6 | `fig6_optimizer_comparison` | AdamW vs Muon comparison |
+
+### Supplementary Figures
+
+| Figure | Filename | Description |
+|--------|----------|-------------|
+| Fig S1 | `figS1_eigenspectrum_heatmaps` | Full eigenspectrum evolution |
+| Fig S2 | `figS2_nongrokking_eigenspectrum` | Non-grokking eigenspectrum |
+| Fig S3-S7 | `figS3-S7_*` | Additional analysis |
+
+### Comprehensive Grid Figures (Addition)
+
+6x2 panels showing normalized VCR, train accuracy, and test accuracy across weight decays:
+
+| Figure | Filename | Description |
+|--------|----------|-------------|
+| | `fig_comprehensive_transformer_discrete` | Transformer + Discrete tokens |
+| | `fig_comprehensive_transformer_onehot` | Transformer + One-hot encoding |
+| | `fig_comprehensive_mlp_discrete` | MLP + Discrete tokens |
+| | `fig_comprehensive_mlp_onehot` | MLP + One-hot encoding |
+
+### Cubic Polynomial Figures
+
+| Figure | Filename | Description |
+|--------|----------|-------------|
+| Fig C1 | `fig_c1_vcr_trajectories_cubic` | VCR trajectories (cubic task) |
+| Fig C2 | `fig_c2_phase_diagram_cubic` | Phase diagram (cubic task) |
+| Fig C3 | `fig_c3_architecture_comparison_cubic` | Architecture comparison (cubic) |
+| | `fig_comprehensive_cubic_transformer_discrete` | Full grid: Transformer + Discrete |
+| | `fig_comprehensive_cubic_transformer_onehot` | Full grid: Transformer + One-hot |
+| | `fig_comprehensive_cubic_mlp_discrete` | Full grid: MLP + Discrete |
+| | `fig_comprehensive_cubic_mlp_onehot` | Full grid: MLP + One-hot |
+
+### Comparative Analysis Figures
+
+Direct comparisons between addition (grokking) and cubic (non-grokking) tasks:
+
+| Figure | Filename | Description |
+|--------|----------|-------------|
+| COMP1 | `fig_comp1_vcr_side_by_side` | VCR trajectories side-by-side |
+| COMP2 | `fig_comp2_vcr_distributions` | VCR distribution by task and outcome |
+| COMP3 | `fig_comp3_key_finding` | Key finding: VCR is not sufficient |
+
+### Comparison Grid Figures (Addition vs Cubic)
+
+8 comprehensive 6x2 grid figures comparing both tasks across weight decays. Each figure shows a specific architecture + optimizer + input type combination:
+
+| Figure | Filename | Takeaways |
+|--------|----------|-----------|
+| | `fig_comparison_grid_transformer_adamw_discrete` | **Clearest grokking signal.** Addition shows sharp VCR spikes at wd=1e-2 and 1e-1 with rapid generalization. Cubic shows similar VCR dynamics but flat test accuracy ~1%. |
+| | `fig_comparison_grid_transformer_adamw_onehot` | Similar patterns to discrete. One-hot encoding doesn't fundamentally change the VCR-grokking relationship. |
+| | `fig_comparison_grid_transformer_muon_discrete` | **Muon shows different VCR dynamics.** Lower peak VCR values for both tasks. Addition still groks but with more gradual VCR increase. |
+| | `fig_comparison_grid_transformer_muon_onehot` | Muon + one-hot combination. VCR remains moderate; grokking still occurs for addition at higher weight decays. |
+| | `fig_comparison_grid_mlp_adamw_discrete` | **MLP shows delayed/reduced grokking.** VCR spikes are present but generalization is slower or absent compared to transformer. |
+| | `fig_comparison_grid_mlp_adamw_onehot` | MLP with one-hot inputs. Similar VCR patterns to discrete, confirming architecture effect dominates input type. |
+| | `fig_comparison_grid_mlp_muon_discrete` | **Lowest VCR values overall.** Muon + MLP combination shows minimal VCR concentration for both tasks. |
+| | `fig_comparison_grid_mlp_muon_onehot` | Similar to discrete. Muon optimizer consistently produces lower VCR regardless of architecture. |
+
+### Key Takeaways from Comparison Grids
+
+1. **VCR spikes occur in both tasks:** The cubic polynomial task shows VCR concentration comparable to the addition task, despite never generalizing. This is the **central finding** of this study.
+
+2. **Grokking is task-dependent, not VCR-dependent:** The same VCR dynamics that predict grokking in modular addition fail to produce generalization in the cubic polynomial task.
+
+3. **Optimizer effect is consistent:** Muon consistently produces lower VCR values than AdamW across both tasks and architectures.
+
+4. **Architecture effect:** Transformers show more pronounced VCR spikes and more reliable grokking than MLPs.
+
+5. **Weight decay is critical:** Both tasks require weight decay for VCR concentration, but only the addition task benefits from this regularization for generalization.
+
+### Example: Transformer + AdamW + Discrete Comparison
+
+This figure shows the clearest contrast between grokking and non-grokking scenarios. See `analysis/figures/fig_comparison_grid_transformer_adamw_discrete.pdf`.
+
+**Observations:**
+- **Left column (Addition):** VCR spikes at wd=1e-2 and 1e-1 coincide with sharp increases in test accuracy (grokking)
+- **Right column (Cubic):** Similar VCR dynamics occur, but test accuracy remains at chance level (~1%)
+- **Both columns:** Training accuracy reaches 100% early, demonstrating memorization
+
+### Example: Key Finding Visualization
+
+See `analysis/figures/fig_comp3_key_finding.pdf` for the visualization.
+
+This figure directly compares VCR trajectories between grokking (addition) and non-grokking (cubic) experiments, demonstrating that high VCR values do not guarantee generalization.
+
+---
+
+## Summary Statistics
+
+### Modular Addition
+| Metric | Value |
+|--------|-------|
+| Total Experiments | 48 |
+| Grokking Rate | ~50% (varies by configuration) |
+| Peak VCR (grokking) | 0.5 - 0.7 |
+| Best Weight Decay | 1e-2, 1e-1 |
+
+### Cubic Polynomial  
+| Metric | Value |
+|--------|-------|
+| Total Experiments | 48 |
+| Grokking Rate | 0% |
+| Peak VCR | 0.5 - 0.7 (similar to addition!) |
+| Test Accuracy | ~1% (chance level) |
+
+---
+
+## Conclusions
+
+1. **VCR is a geometric measure, not a generalization predictor:** High VCR indicates concentrated gradient sensitivity but doesn't guarantee learning the target function.
+
+2. **Task structure matters:** The modular addition task has exploitable algebraic structure that enables generalization. The cubic polynomial, despite inducing similar gradient geometry, lacks this structure.
+
+3. **Future directions:**
+   - Investigate what additional conditions beyond VCR are needed for grokking
+   - Explore other tasks with varying complexity
+   - Study the role of input representation in enabling generalization
 
 ---
 
