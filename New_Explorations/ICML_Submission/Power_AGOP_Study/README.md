@@ -495,6 +495,112 @@ This figure directly compares VCR trajectories between grokking (addition) and n
 
 ---
 
+## Extended AGOP Metric Analysis
+
+Beyond VCR, we analyzed all other AGOP-derived metrics to understand which properties distinguish grokking from non-grokking scenarios. Each metric was visualized in 6x2 comparison grids (rows = weight decay, columns = addition vs cubic).
+
+### AGOP Metrics Analyzed
+
+| Metric | Formula | Description |
+|--------|---------|-------------|
+| **Trace** | $\sum_i \lambda_i$ | Total gradient variance |
+| **Eigengap** | $\lambda_1 - \lambda_2$ | Gradient alignment strength |
+| **Spectral Radius** | $\lambda_1$ | Largest eigenvalue (max sensitivity) |
+| **Frobenius Norm** | $\|\text{AGOP}\|_F$ | Total AGOP magnitude |
+| **Top-5 Energy** | $\sum_{i=1}^{5} \lambda_i / \sum \lambda_i$ | Energy in top 5 eigenvectors |
+| **Top-10 Energy** | $\sum_{i=1}^{10} \lambda_i / \sum \lambda_i$ | Energy in top 10 eigenvectors |
+| **Subspace Similarity** | Cosine of top-k eigenvectors | Stability of gradient directions |
+
+### Key Findings Across All AGOP Metrics
+
+#### 1. **AGOP Trace (Total Gradient Variance)**
+
+![AGOP Trace: Transformer + AdamW + Discrete](analysis/figures/fig_comparison_agop_trace_transformer_adamw_discrete.png)
+
+**Observations:**
+- **Addition (grokking):** Trace decreases as training progresses, especially with higher weight decay. Sharp drops often coincide with grokking onset.
+- **Cubic (no grokking):** Trace follows similar decreasing patterns but continues declining without generalization.
+- **Conclusion:** Trace dynamics are similar between tasks — **trace alone does not distinguish grokking from non-grokking**.
+
+#### 2. **AGOP Eigengap ($\lambda_1 - \lambda_2$)**
+
+![AGOP Eigengap: Transformer + AdamW + Discrete](analysis/figures/fig_comparison_agop_eigengap_transformer_adamw_discrete.png)
+
+**Observations:**
+- **Addition:** Eigengap increases during training, indicating gradients align to a dominant direction. Peaks correlate with grokking.
+- **Cubic:** Eigengap also increases significantly, sometimes even more than addition.
+- **Conclusion:** High eigengap (gradient alignment) is **not sufficient** for grokking. Both tasks show strong alignment.
+
+#### 3. **AGOP Spectral Radius ($\lambda_1$)**
+
+![AGOP Spectral Radius: Transformer + AdamW + Discrete](analysis/figures/fig_comparison_agop_spectral_radius_transformer_adamw_discrete.png)
+
+**Observations:**
+- **Addition:** $\lambda_1$ shows characteristic spikes, especially at intermediate weight decays (1e-2, 1e-1).
+- **Cubic:** Similar $\lambda_1$ dynamics — spikes occur at the same weight decay values.
+- **Conclusion:** The largest eigenvalue behavior is **nearly identical** between tasks. This reinforces that the **gradient geometry is similar** even when generalization differs.
+
+#### 4. **AGOP Frobenius Norm**
+
+![AGOP Frobenius: Transformer + AdamW + Discrete](analysis/figures/fig_comparison_agop_frobenius_transformer_adamw_discrete.png)
+
+**Observations:**
+- Both tasks show decreasing Frobenius norm with higher weight decay (regularization reduces gradient magnitudes).
+- No clear difference between grokking and non-grokking experiments.
+- **Conclusion:** Frobenius norm reflects overall gradient scale, **not task learnability**.
+
+#### 5. **Top-5 and Top-10 Energy Ratios**
+
+![AGOP Top-5 Energy: Transformer + AdamW + Discrete](analysis/figures/fig_comparison_agop_top5_energy_ratio_transformer_adamw_discrete.png)
+
+![AGOP Top-10 Energy: Transformer + AdamW + Discrete](analysis/figures/fig_comparison_agop_top10_energy_ratio_transformer_adamw_discrete.png)
+
+**Observations:**
+- **Both tasks** achieve high energy concentration (>0.8 for top-5, >0.9 for top-10) in the principal eigenvectors.
+- Cubic task sometimes shows **higher** energy concentration than addition!
+- **Conclusion:** Energy concentration metrics behave **identically or even more extremely** in the non-grokking task. These are **not predictive of generalization**.
+
+#### 6. **Subspace Similarity (Stability)**
+
+![AGOP Subspace Similarity: Transformer + AdamW + Discrete](analysis/figures/fig_comparison_agop_topk_subspace_similarity_transformer_adamw_discrete.png)
+
+**Observations:**
+- Subspace similarity measures how stable the top-k eigenvector directions are between consecutive checkpoints.
+- **Addition:** Subspace stabilizes (high similarity) around grokking onset.
+- **Cubic:** Subspace also stabilizes, but **no grokking occurs**.
+- **Conclusion:** Stable gradient subspaces are necessary but **not sufficient** for grokking.
+
+---
+
+## Major Conclusions from Extended AGOP Analysis
+
+### The Central Finding: AGOP Metrics Cannot Distinguish Grokking from Non-Grokking
+
+| Metric | Addition (Grokking) | Cubic (No Grokking) | Distinguishes? |
+|--------|---------------------|---------------------|----------------|
+| VCR | High spikes (0.5-0.7) | High spikes (0.5-0.7) | ❌ No |
+| Trace | Decreasing | Decreasing | ❌ No |
+| Eigengap | Increasing | Increasing | ❌ No |
+| Spectral Radius | Spikes present | Spikes present | ❌ No |
+| Frobenius | Decreasing | Decreasing | ❌ No |
+| Top-5 Energy | >0.8 | >0.8 (sometimes higher) | ❌ No |
+| Top-10 Energy | >0.9 | >0.9 | ❌ No |
+| Subspace Similarity | Stabilizes | Stabilizes | ❌ No |
+
+### Implications
+
+1. **Gradient geometry is task-agnostic:** The AGOP captures how the model's sensitivity is distributed across input directions, but this distribution evolves similarly regardless of whether the task is learnable.
+
+2. **Grokking requires more than geometric concentration:** The cubic polynomial induces the same gradient concentration as modular addition, but the model cannot find the underlying pattern. This suggests:
+   - The **task's algebraic structure** must be compatible with the model's inductive biases
+   - Gradient concentration may be a **necessary condition** (all grokking experiments show it) but is **not sufficient**
+
+3. **The "what" matters more than the "how much":** VCR and related metrics measure **how concentrated** gradients are, but not **which direction** they concentrate. The addition task may concentrate gradients along directions that encode modular structure, while cubic concentrates along unhelpful directions.
+
+4. **Future work should analyze eigenvectors, not just eigenvalues:** The directions of concentration (AGOP eigenvectors) may reveal why addition groks and cubic doesn't.
+
+---
+
 ## Summary Statistics
 
 ### Modular Addition
