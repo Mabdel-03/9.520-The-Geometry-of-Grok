@@ -31,7 +31,8 @@ def create_modular_dataset_discrete(
     
     Args:
         p: Modulus (prime number)
-        operation: 'add', 'sub', 'mul', 'div', or 'cubic' (x³+xy)
+        operation: 'add', 'sub', 'mul', 'div', 'cubic' (x³+xy), 'quadratic' (a²+b),
+                   'symmetric_cubic' (a³+b³), or 'mixed_poly' (a²+ab+b²)
         train_fraction: Fraction of data for training (default 0.5 = 50%)
         seed: Random seed for reproducibility
         device: Device to place tensors on
@@ -74,6 +75,15 @@ def create_modular_dataset_discrete(
             elif operation == 'cubic':
                 # x³ + xy mod p - more complex polynomial operation
                 label = (a**3 + a*b) % p
+            elif operation == 'quadratic':
+                # a² + b mod p - asymmetric quadratic
+                label = (a**2 + b) % p
+            elif operation == 'symmetric_cubic':
+                # a³ + b³ mod p - symmetric cubic polynomial
+                label = (a**3 + b**3) % p
+            elif operation == 'mixed_poly':
+                # a² + ab + b² mod p - symmetric quadratic with interaction
+                label = (a**2 + a*b + b**2) % p
             else:
                 raise ValueError(f"Unknown operation: {operation}")
             
@@ -115,7 +125,8 @@ def create_modular_dataset_onehot(
     
     Args:
         p: Modulus (prime number)
-        operation: 'add', 'sub', 'mul', 'div', or 'cubic' (x³+xy)
+        operation: 'add', 'sub', 'mul', 'div', 'cubic' (x³+xy), 'quadratic' (a²+b),
+                   'symmetric_cubic' (a³+b³), or 'mixed_poly' (a²+ab+b²)
         train_fraction: Fraction of data for training (default 0.5 = 50%)
         seed: Random seed for reproducibility
         device: Device to place tensors on
@@ -162,6 +173,15 @@ def create_modular_dataset_onehot(
             elif operation == 'cubic':
                 # x³ + xy mod p - more complex polynomial operation
                 label = (a**3 + a*b) % p
+            elif operation == 'quadratic':
+                # a² + b mod p - asymmetric quadratic
+                label = (a**2 + b) % p
+            elif operation == 'symmetric_cubic':
+                # a³ + b³ mod p - symmetric cubic polynomial
+                label = (a**3 + b**3) % p
+            elif operation == 'mixed_poly':
+                # a² + ab + b² mod p - symmetric quadratic with interaction
+                label = (a**2 + a*b + b**2) % p
             else:
                 raise ValueError(f"Unknown operation: {operation}")
             

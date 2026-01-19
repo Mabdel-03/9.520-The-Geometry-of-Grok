@@ -240,7 +240,7 @@ Power_AGOP_Study/
 │   ├── __init__.py
 │   ├── power_transformer.py    # Decoder-only transformer implementation
 │   ├── grokking_mlp.py         # MLP baseline implementation
-│   ├── datasets.py             # Modular arithmetic dataset (add, cubic, etc.)
+│   ├── datasets.py             # Modular arithmetic dataset (all operations)
 │   ├── agop_utils.py           # AGOP computation utilities
 │   └── lazy_rich_utils.py      # Training dynamics utilities
 ├── training_scripts/
@@ -248,19 +248,18 @@ Power_AGOP_Study/
 ├── slurm_scripts/
 │   ├── run_power_sweep.sh      # SLURM array job for addition (48 experiments)
 │   ├── run_cubic_sweep.sh      # SLURM array job for cubic (48 experiments)
+│   ├── run_task_complexity_sweep.sh  # SLURM job for Experiment 4 (16 experiments)
+│   ├── run_notebook_analysis.sh      # Execute analysis notebook
 │   └── logs/                   # Job output logs
+├── analysis/
+│   ├── analyze_power_agop.ipynb      # Main analysis notebook (all experiments)
+│   └── figures/                      # Generated figures (PNG and PDF)
 ├── results/                    # Addition experiment outputs
-│   └── {arch}_{input}_{opt}/
-│       └── wd{weight_decay}_seed{seed}/
-│           ├── config.json
-│           ├── training_history.json
-│           └── agop_metrics.h5
-└── results_cubic/              # Cubic polynomial experiment outputs
-    └── {arch}_{input}_{opt}/
-        └── wd{weight_decay}_seed{seed}/
-            ├── config.json
-            ├── training_history.json
-            └── agop_metrics.h5
+├── results_cubic/              # Cubic polynomial experiment outputs
+├── results_mul/                # Multiplication experiment outputs (Exp 4)
+├── results_quadratic/          # Quadratic experiment outputs (Exp 4)
+├── results_symmetric_cubic/    # Symmetric cubic experiment outputs (Exp 4)
+└── results_mixed_poly/         # Mixed polynomial experiment outputs (Exp 4)
 ```
 
 ---
@@ -631,6 +630,116 @@ Beyond VCR, we analyzed all other AGOP-derived metrics to understand which prope
    - Investigate what additional conditions beyond VCR are needed for grokking
    - Explore other tasks with varying complexity
    - Study the role of input representation in enabling generalization
+
+---
+
+## Part VI: Additional Experiments for ICML Submission
+
+The following experiments extend the analysis to test the hypothesis that **eigenvector directions** (not eigenvalue magnitudes) distinguish grokking from non-grokking tasks.
+
+### Experiment 5: Contingency Analysis (Necessary but Not Sufficient)
+
+**Status:** ✅ Implemented in notebook
+
+Statistical analysis providing evidence that high VCR is necessary but not sufficient for grokking:
+- Loads all 96 experiments (48 addition + 48 cubic)
+- Builds 2×2 contingency table: Task vs Grokking outcome
+- Fisher's exact test and odds ratio computation
+- Visualization of test accuracy distributions by task
+
+### Experiment 1: Eigenvector Direction Analysis
+
+**Status:** 🔧 Framework ready (requires model checkpoints)
+
+Compares top-k eigenvector directions between grokking and non-grokking tasks:
+- Cosine similarity between corresponding eigenvectors
+- Heatmap visualization of similarity over training epochs
+- Tests whether cubic eigenvectors are "misaligned" with addition's principal directions
+
+### Experiment 2: Eigenvector Interpretability Analysis
+
+**Status:** 🔧 Framework ready (requires eigenvectors from Exp 1)
+
+Analyzes whether addition eigenvectors encode interpretable modular structure:
+- FFT analysis for cyclic patterns at period 97
+- Symmetry tests (a-b component correlation)
+- Visualization as 2×97 heatmaps
+
+### Experiment 3: Representation Geometry Analysis
+
+**Status:** 🔧 Framework ready (requires hidden representations)
+
+Analyzes learned representations beyond gradients:
+- Effective rank of representation matrix
+- Local intrinsic dimension (TwoNN estimator)
+- Centered Kernel Alignment (CKA) with labels
+
+### Experiment 4: Task Complexity Spectrum
+
+**Status:** 🔧 Ready to run (new operations added)
+
+Tests intermediate-complexity tasks to establish a complexity-grokking curve:
+
+| Task | Operation | Complexity |
+|------|-----------|------------|
+| Addition | $(a + b) \mod 97$ | Baseline (grokking) |
+| Multiplication | $(a \times b) \mod 97$ | Low |
+| Quadratic | $(a^2 + b) \mod 97$ | Medium |
+| Mixed Polynomial | $(a^2 + ab + b^2) \mod 97$ | Medium |
+| Symmetric Cubic | $(a^3 + b^3) \mod 97$ | High |
+| Cubic | $(a^3 + ab) \mod 97$ | Highest (no grokking) |
+
+### Experiment 6: Weight Matrix Subspace Analysis
+
+**Status:** 🔧 Framework ready (requires model checkpoints)
+
+Analyzes weight matrix structure:
+- Singular value spectrum
+- Low-rank approximation error
+- Weight sparsity
+
+---
+
+## Running the New Experiments
+
+### Task Complexity Sweep (16 experiments)
+```bash
+cd slurm_scripts
+sbatch run_task_complexity_sweep.sh
+```
+
+This runs 4 new operations × 4 weight decays with transformer + adamw + discrete configuration.
+
+### Run Notebook Analysis
+```bash
+cd slurm_scripts
+sbatch run_notebook_analysis.sh
+```
+
+Executes the entire analysis notebook, including Experiment 5 (contingency analysis).
+
+### Manual Execution of New Tasks
+```bash
+# Multiplication
+python training_scripts/train_power_agop.py \
+    --operation mul --weight_decay 0.01 --n_epochs 25000 \
+    --save_dir ./results_mul
+
+# Quadratic
+python training_scripts/train_power_agop.py \
+    --operation quadratic --weight_decay 0.01 --n_epochs 25000 \
+    --save_dir ./results_quadratic
+
+# Symmetric Cubic
+python training_scripts/train_power_agop.py \
+    --operation symmetric_cubic --weight_decay 0.01 --n_epochs 25000 \
+    --save_dir ./results_symmetric_cubic
+
+# Mixed Polynomial
+python training_scripts/train_power_agop.py \
+    --operation mixed_poly --weight_decay 0.01 --n_epochs 25000 \
+    --save_dir ./results_mixed_poly
+```
 
 ---
 

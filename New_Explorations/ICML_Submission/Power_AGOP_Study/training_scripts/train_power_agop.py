@@ -215,8 +215,8 @@ def main():
     parser.add_argument('--modulus', '-p', type=int, default=97,
                        help='Modulus for modular arithmetic')
     parser.add_argument('--operation', type=str, default='add',
-                       choices=['add', 'sub', 'mul', 'div', 'cubic'],
-                       help='Modular operation: add (x+y), sub (x-y), mul (x*y), div (x/y), cubic (x^3+xy)')
+                       choices=['add', 'sub', 'mul', 'div', 'cubic', 'quadratic', 'symmetric_cubic', 'mixed_poly'],
+                       help='Modular operation: add (x+y), sub (x-y), mul (x*y), div (x/y), cubic (x^3+xy), quadratic (a^2+b), symmetric_cubic (a^3+b^3), mixed_poly (a^2+ab+b^2)')
     parser.add_argument('--train_fraction', type=float, default=0.5, 
                        help='Fraction of data for training (0.5 means 50 percent)')
     
@@ -289,7 +289,10 @@ def main():
         'sub': 'x - y', 
         'mul': 'x * y',
         'div': 'x / y',
-        'cubic': 'x³ + xy'
+        'cubic': 'x³ + xy',
+        'quadratic': 'a² + b',
+        'symmetric_cubic': 'a³ + b³',
+        'mixed_poly': 'a² + ab + b²',
     }
     op_desc = op_descriptions.get(args.operation, args.operation)
     
