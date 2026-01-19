@@ -1,0 +1,31 @@
+{
+  "modulus": 97,
+  "operation": "cubic",
+  "train_fraction": 0.5,
+  "architecture": "mlp",
+  "input_type": "discrete",
+  "d_model": 128,
+  "n_heads": 4,
+  "n_layers": 2,
+  "d_mlp": 512,
+  "optimizer": "adamw",
+  "lr": 0.001,
+  "weight_decay": 0.01,
+  "n_epochs": 500,
+  "device": "cpu",
+  "seed": 42,
+  "log_freq": 100,
+  "agop_freq": 100,
+  "agop_subsample": null,
+  "agop_top_k": 20,
+  "save_dir": "./results_cubic_test",
+  "experiment_name": "mlp_discrete_adamw/wd0.01_seed42",
+  "n_params": 456417,
+  "model_config": {
+    "p": 97,
+    "d_embed": 128,
+    "d_hidden": 512,
+    "use_layernorm": false,
+    "input_type": "discrete"
+  }
+}

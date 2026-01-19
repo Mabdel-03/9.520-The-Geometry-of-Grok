@@ -1,0 +1,33 @@
+{
+  "modulus": 97,
+  "operation": "quadratic",
+  "train_fraction": 0.5,
+  "architecture": "transformer",
+  "input_type": "discrete",
+  "d_model": 128,
+  "n_heads": 4,
+  "n_layers": 2,
+  "d_mlp": 512,
+  "optimizer": "adamw",
+  "lr": 0.001,
+  "weight_decay": 0.001,
+  "n_epochs": 25000,
+  "device": "cuda",
+  "seed": 42,
+  "log_freq": 100,
+  "agop_freq": 100,
+  "agop_subsample": null,
+  "agop_top_k": 20,
+  "save_dir": "/om2/user/mabdel03/files/Classes/9.520/9.520-The-Geometry-of-Grok/New_Explorations/ICML_Submission/Power_AGOP_Study/results_quadratic",
+  "experiment_name": "transformer_discrete_adamw/wd0.001_seed42",
+  "n_params": 421120,
+  "model_config": {
+    "p": 97,
+    "d_model": 128,
+    "n_heads": 4,
+    "n_layers": 2,
+    "d_mlp": 512,
+    "max_seq_len": 3,
+    "vocab_size": 98
+  }
+}
