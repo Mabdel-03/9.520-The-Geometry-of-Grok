@@ -84,6 +84,12 @@ def create_modular_dataset_discrete(
             elif operation == 'mixed_poly':
                 # a² + ab + b² mod p - symmetric quadratic with interaction
                 label = (a**2 + a*b + b**2) % p
+            elif operation == 'pure_cubic':
+                # x³ mod p - pure cubic (single variable, ignores b)
+                label = (a**3) % p
+            elif operation == 'pure_mul':
+                # x * y mod p - pure multiplication (same as mul, explicit alias)
+                label = (a * b) % p
             else:
                 raise ValueError(f"Unknown operation: {operation}")
             
@@ -182,6 +188,12 @@ def create_modular_dataset_onehot(
             elif operation == 'mixed_poly':
                 # a² + ab + b² mod p - symmetric quadratic with interaction
                 label = (a**2 + a*b + b**2) % p
+            elif operation == 'pure_cubic':
+                # x³ mod p - pure cubic (single variable, ignores b)
+                label = (a**3) % p
+            elif operation == 'pure_mul':
+                # x * y mod p - pure multiplication (same as mul, explicit alias)
+                label = (a * b) % p
             else:
                 raise ValueError(f"Unknown operation: {operation}")
             

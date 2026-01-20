@@ -248,9 +248,13 @@ class InputGradientAGOPTracker:
                 metrics['agop_top5_energy_ratio'] = 0.0
                 metrics['agop_top10_energy_ratio'] = 0.0
             
-            # ---------- Store top eigenvalues ----------
-            for i in range(min(10, len(eigvals))):
+            # ---------- Store top 20 eigenvalues ----------
+            for i in range(min(20, len(eigvals))):
                 metrics[f'agop_eigenvalue_{i+1}'] = eigvals[i].item()
+            
+            # ---------- Store top 20 eigenvectors ----------
+            for i in range(min(20, len(eigvals))):
+                metrics[f'agop_eigenvector_{i+1}'] = eigvecs[:, i].cpu().numpy().tolist()
             
             # Update history with all metrics
             for key, value in metrics.items():

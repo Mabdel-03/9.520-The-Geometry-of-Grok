@@ -20,14 +20,28 @@ Where $\lambda_i$ are the eigenvalues of the AGOP matrix. A higher VCR indicates
 
 ## Tasks
 
-This study includes two modular arithmetic tasks:
+This study includes multiple modular arithmetic tasks with varying complexity:
+
+### Core Tasks
 
 | Task | Operation | Description | Expected Behavior |
 |------|-----------|-------------|-------------------|
 | **Addition** | $f(a, b) = (a + b) \mod 97$ | Original Power et al. task | Grokking expected |
-| **Cubic Polynomial** | $f(a, b) = (a^3 + ab) \mod 97$ | More complex polynomial | Grokking unlikely |
+| **Subtraction** | $f(a, b) = (a - b) \mod 97$ | Modular subtraction | Grokking expected |
+| **Multiplication** | $f(a, b) = (a \times b) \mod 97$ | Modular multiplication | Grokking expected |
+| **Division** | $f(a, b) = (a / b) \mod 97$ | Modular division (Fermat's theorem) | Grokking expected |
 
-The cubic polynomial task serves as a **negative control** to test whether VCR spikes are specifically associated with grokking, or occur in all training scenarios.
+### Polynomial Tasks
+
+| Task | Operation | Description | Expected Behavior |
+|------|-----------|-------------|-------------------|
+| **Cubic** | $f(a, b) = (a^3 + ab) \mod 97$ | Cubic with interaction term | Grokking unlikely |
+| **Pure Cubic** | $f(a, b) = a^3 \mod 97$ | Pure cubic (single variable) | Uncertain |
+| **Quadratic** | $f(a, b) = (a^2 + b) \mod 97$ | Asymmetric quadratic | Uncertain |
+| **Symmetric Cubic** | $f(a, b) = (a^3 + b^3) \mod 97$ | Symmetric cubic polynomial | Uncertain |
+| **Mixed Polynomial** | $f(a, b) = (a^2 + ab + b^2) \mod 97$ | Symmetric quadratic with interaction | Uncertain |
+
+The polynomial tasks serve as **controls** to test whether VCR spikes are specifically associated with grokking, or occur in all training scenarios.
 
 ---
 
@@ -41,10 +55,11 @@ The cubic polynomial task serves as a **negative control** to test whether VCR s
 | Property | Value |
 |----------|-------|
 | Total examples | $97^2 = 9409$ |
-| Train split | 50% (4,704 examples) |
-| Test split | 50% (4,705 examples) |
+| Train/Test splits | **50/50** (4,704/4,705) and **80/20** (7,527/1,882) |
 | Split method | Random (seed=42) |
 | Output | 97-dimensional logits + cross-entropy loss |
+
+**Note:** The extended experiments (January 2026) test both 50/50 and 80/20 train/test splits to investigate the effect of training data size on grokking dynamics.
 
 ### Input Representations
 1. **Discrete tokens** (default): Integers $a, b \in \{0, 1, \ldots, 96\}$ embedded via learned embedding layer
@@ -198,14 +213,35 @@ The Average Gradient Outer Product captures how the model's output sensitivity v
 - `agop_top5_energy_ratio`: $\sum_{i=1}^{5} \lambda_i / \sum \lambda_i$
 - `agop_top10_energy_ratio`: $\sum_{i=1}^{10} \lambda_i / \sum \lambda_i$
 
+**Eigenvalues and Eigenvectors (Extended Experiments):**
+- `agop_eigenvalue_1` through `agop_eigenvalue_20`: First 20 eigenvalues
+- `agop_eigenvector_1` through `agop_eigenvector_20`: First 20 eigenvectors (stored in HDF5)
+
 ---
 
 ## Experiment Matrix
+
+### Original Experiments (Completed)
 
 **Total: 96 experiments** = 2 (tasks) × 2 (architectures) × 2 (optimizers) × 2 (input types) × 6 (weight decays)
 
 - **48 experiments** for modular addition (original)
 - **48 experiments** for cubic polynomial (negative control)
+
+### Extended Experiments (January 2026)
+
+**Total: 864 experiments** = 9 (operations) × 2 (train/test splits) × 2 (architectures) × 2 (optimizers) × 2 (input types) × 6 (weight decays)
+
+| Parameter | Values |
+|-----------|--------|
+| **Operations** | add, sub, mul, div, cubic, quadratic, symmetric_cubic, mixed_poly, pure_cubic |
+| **Train/Test Splits** | 50/50, 80/20 |
+| **Architectures** | transformer, mlp |
+| **Optimizers** | adamw, muon |
+| **Input Types** | discrete, onehot |
+| **Weight Decays** | 0, 1e-4, 1e-3, 1e-2, 1e-1, 1.0 |
+
+The extended experiments also track the **first 20 AGOP eigenvalues and eigenvectors** at each checkpoint.
 
 ### SLURM Array Task Mapping
 
@@ -234,51 +270,60 @@ Within each range, weight decay varies: `[0, 1e-4, 1e-3, 1e-2, 1e-1, 1.0]`
 Power_AGOP_Study/
 ├── README.md                    # This file
 ├── configs/
-│   ├── power_agop_sweep.yaml   # Addition experiment configuration
-│   └── cubic_agop_sweep.yaml   # Cubic polynomial experiment configuration
+│   ├── power_agop_sweep.yaml         # Addition experiment configuration
+│   ├── cubic_agop_sweep.yaml         # Cubic polynomial experiment configuration
+│   └── extended_operations_sweep.yaml # Extended experiments configuration (Jan 2026)
 ├── core/
 │   ├── __init__.py
 │   ├── power_transformer.py    # Decoder-only transformer implementation
 │   ├── grokking_mlp.py         # MLP baseline implementation
 │   ├── datasets.py             # Modular arithmetic dataset (all operations)
-│   ├── agop_utils.py           # AGOP computation utilities
+│   ├── agop_utils.py           # AGOP computation utilities (tracks 20 eigenvalues/vectors)
 │   └── lazy_rich_utils.py      # Training dynamics utilities
 ├── training_scripts/
-│   └── train_power_agop.py     # Main training script (supports --operation)
+│   └── train_power_agop.py     # Main training script (supports all operations)
 ├── slurm_scripts/
-│   ├── run_power_sweep.sh      # SLURM array job for addition (48 experiments)
-│   ├── run_cubic_sweep.sh      # SLURM array job for cubic (48 experiments)
+│   ├── run_power_sweep.sh            # SLURM array job for addition (48 experiments)
+│   ├── run_cubic_sweep.sh            # SLURM array job for cubic (48 experiments)
 │   ├── run_task_complexity_sweep.sh  # SLURM job for Experiment 4 (16 experiments)
+│   ├── run_all_operations_50_50.sh   # Extended: All 9 ops, 50/50 split (432 experiments)
+│   ├── run_all_operations_80_20.sh   # Extended: All 9 ops, 80/20 split (432 experiments)
 │   ├── run_notebook_analysis.sh      # Execute analysis notebook
-│   └── logs/                   # Job output logs
+│   └── logs/                         # Job output logs
 ├── analysis/
 │   ├── analyze_power_agop.ipynb      # Main analysis notebook (all experiments)
 │   └── figures/                      # Generated figures (PNG and PDF)
 ├── results/                    # Addition experiment outputs
 ├── results_cubic/              # Cubic polynomial experiment outputs
-├── results_mul/                # Multiplication experiment outputs (Exp 4)
-├── results_quadratic/          # Quadratic experiment outputs (Exp 4)
-├── results_symmetric_cubic/    # Symmetric cubic experiment outputs (Exp 4)
-└── results_mixed_poly/         # Mixed polynomial experiment outputs (Exp 4)
+├── results_mul/                # Multiplication experiment outputs
+├── results_quadratic/          # Quadratic experiment outputs
+├── results_symmetric_cubic/    # Symmetric cubic experiment outputs
+├── results_mixed_poly/         # Mixed polynomial experiment outputs
+├── results_pure_cubic_50/      # Pure cubic (50/50 split) - Extended experiments
+├── results_pure_cubic_80/      # Pure cubic (80/20 split) - Extended experiments
+├── results_{op}_50/            # Extended experiments: {op} with 50/50 split
+└── results_{op}_80/            # Extended experiments: {op} with 80/20 split
 ```
 
 ---
 
 ## Running Experiments
 
-### Submit All Addition Experiments (48 jobs)
+### Original Experiments
+
+#### Submit All Addition Experiments (48 jobs)
 ```bash
 cd slurm_scripts
 sbatch run_power_sweep.sh
 ```
 
-### Submit All Cubic Polynomial Experiments (48 jobs)
+#### Submit All Cubic Polynomial Experiments (48 jobs)
 ```bash
 cd slurm_scripts
 sbatch run_cubic_sweep.sh
 ```
 
-### Submit Specific Tasks
+#### Submit Specific Tasks
 ```bash
 # Run only transformer + adamw + discrete experiments (tasks 0-5)
 sbatch --array=0-5 run_power_sweep.sh   # Addition
@@ -288,6 +333,22 @@ sbatch --array=0-5 run_cubic_sweep.sh   # Cubic
 sbatch --array=3 run_power_sweep.sh  # transformer_discrete_adamw, wd=1e-2, addition
 sbatch --array=3 run_cubic_sweep.sh  # transformer_discrete_adamw, wd=1e-2, cubic
 ```
+
+### Extended Experiments (January 2026)
+
+#### Submit All Operations with 50/50 Split (432 jobs)
+```bash
+cd slurm_scripts
+sbatch run_all_operations_50_50.sh
+```
+
+#### Submit All Operations with 80/20 Split (432 jobs)
+```bash
+cd slurm_scripts
+sbatch run_all_operations_80_20.sh
+```
+
+These extended experiments run all 9 operations across the full experimental matrix and save the first 20 AGOP eigenvalues and eigenvectors at each checkpoint.
 
 ### Run Single Experiment Manually
 ```bash
@@ -330,11 +391,14 @@ Contains per-epoch metrics:
 ```
 
 ### `agop_metrics.h5`
-HDF5 file containing AGOP eigenvalues and metrics at each checkpoint:
-- `epochs`: Array of epoch numbers
-- `eigenvalues`: [n_checkpoints, top_k] array of eigenvalues
-- `vcr`: Variation collapse ratio over time
-- `trace`, `eigengap`, etc.
+HDF5 file containing AGOP eigenvalues, eigenvectors, and metrics at each checkpoint:
+- `epoch`: Array of epoch numbers when AGOP was computed
+- `agop_eigenvalue_1` through `agop_eigenvalue_20`: Top 20 eigenvalues over time
+- `agop_eigenvector_1` through `agop_eigenvector_20`: Top 20 eigenvectors (shape: n_checkpoints × input_dim)
+- `agop_variation_collapse_ratio`: VCR over time
+- `agop_trace`, `agop_eigengap`, `agop_spectral_radius`, `agop_frobenius`: Additional metrics
+- `agop_top5_energy_ratio`, `agop_top10_energy_ratio`: Energy concentration metrics
+- `agop_topk_subspace_similarity`: Subspace stability metric
 
 ---
 
@@ -349,6 +413,17 @@ HDF5 file containing AGOP eigenvalues and metrics at each checkpoint:
 - **Job ID:** 44559114
 - **Status:** ✅ Completed (January 2026)
 - **Results:** Available in `results_cubic/`
+
+### Extended Experiments - 50/50 Split (In Progress)
+- **Job ID:** 44588955
+- **Status:** 🔄 Running (January 2026)
+- **Total Jobs:** 432 (9 operations × 48 configurations)
+- **Results:** Will be saved to `results_{operation}_50/`
+
+### Extended Experiments - 80/20 Split (Pending)
+- **Status:** ⏳ Pending submission
+- **Total Jobs:** 432 (9 operations × 48 configurations)
+- **Results:** Will be saved to `results_{operation}_80/`
 
 ### Analysis (Complete)
 - **Notebook:** `analysis/analyze_power_agop.ipynb`
@@ -676,18 +751,23 @@ Analyzes learned representations beyond gradients:
 
 ### Experiment 4: Task Complexity Spectrum
 
-**Status:** 🔧 Ready to run (new operations added)
+**Status:** 🔄 Extended (January 2026)
 
 Tests intermediate-complexity tasks to establish a complexity-grokking curve:
 
 | Task | Operation | Complexity |
 |------|-----------|------------|
 | Addition | $(a + b) \mod 97$ | Baseline (grokking) |
+| Subtraction | $(a - b) \mod 97$ | Baseline |
 | Multiplication | $(a \times b) \mod 97$ | Low |
+| Division | $(a / b) \mod 97$ | Low-Medium |
 | Quadratic | $(a^2 + b) \mod 97$ | Medium |
 | Mixed Polynomial | $(a^2 + ab + b^2) \mod 97$ | Medium |
+| **Pure Cubic** | $(a^3) \mod 97$ | Medium-High (NEW) |
 | Symmetric Cubic | $(a^3 + b^3) \mod 97$ | High |
 | Cubic | $(a^3 + ab) \mod 97$ | Highest (no grokking) |
+
+**Extended Experiments (January 2026):** All 9 operations are now being tested with both 50/50 and 80/20 train/test splits, with the first 20 AGOP eigenvalues and eigenvectors tracked at each checkpoint.
 
 ### Experiment 6: Weight Matrix Subspace Analysis
 

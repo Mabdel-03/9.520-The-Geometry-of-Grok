@@ -1,0 +1,232 @@
+# Extended Operations AGOP Study Configuration
+# 
+# Comprehensive study of grokking and AGOP metrics across:
+# - 9 modular arithmetic operations
+# - 2 train/test splits (50/50, 80/20)
+# - Full experimental matrix (architecture, optimizer, input type, weight decay)
+#
+# Total: 864 experiments = 9 ops × 2 splits × 2 arch × 2 opt × 2 input × 6 wd
+
+# ==============================================================================
+# Operations
+# ==============================================================================
+
+operations:
+  add:
+    formula: "(a + b) mod p"
+    description: "Modular addition - original Power et al. task"
+    expected_grokking: true
+    
+  sub:
+    formula: "(a - b) mod p"
+    description: "Modular subtraction"
+    expected_grokking: true
+    
+  mul:
+    formula: "(a * b) mod p"
+    description: "Modular multiplication"
+    expected_grokking: true
+    
+  div:
+    formula: "(a / b) mod p"
+    description: "Modular division (using Fermat's little theorem)"
+    expected_grokking: true
+    note: "Excludes b=0 cases"
+    
+  cubic:
+    formula: "(a³ + ab) mod p"
+    description: "Cubic polynomial with interaction term"
+    expected_grokking: uncertain
+    
+  quadratic:
+    formula: "(a² + b) mod p"
+    description: "Asymmetric quadratic"
+    expected_grokking: uncertain
+    
+  symmetric_cubic:
+    formula: "(a³ + b³) mod p"
+    description: "Symmetric cubic polynomial"
+    expected_grokking: uncertain
+    
+  mixed_poly:
+    formula: "(a² + ab + b²) mod p"
+    description: "Symmetric quadratic with interaction"
+    expected_grokking: uncertain
+    
+  pure_cubic:
+    formula: "(a³) mod p"
+    description: "Pure cubic - single variable, ignores b"
+    expected_grokking: uncertain
+    note: "Only depends on first input, effectively a 1D function"
+
+# ==============================================================================
+# Train/Test Splits
+# ==============================================================================
+
+splits:
+  split_50:
+    train_fraction: 0.5
+    description: "50/50 train/test split (original Power et al. setting)"
+    train_examples: 4704
+    test_examples: 4705
+    
+  split_80:
+    train_fraction: 0.8
+    description: "80/20 train/test split (more training data)"
+    train_examples: 7527
+    test_examples: 1882
+
+# ==============================================================================
+# Dataset Configuration
+# ==============================================================================
+
+dataset:
+  modulus: 97
+  total_examples: 9409
+  seed: 42
+
+# ==============================================================================
+# Architecture Configurations
+# ==============================================================================
+
+architectures:
+  transformer:
+    description: "Decoder-only Transformer (Power et al. style)"
+    d_model: 128
+    n_layers: 2
+    n_heads: 4
+    d_mlp: 512
+    approx_params: 400000
+
+  mlp:
+    description: "3-layer MLP baseline"
+    d_embed: 128
+    hidden_layers: [512, 512]
+    approx_params: 300000
+
+# ==============================================================================
+# Optimizer Configurations
+# ==============================================================================
+
+optimizers:
+  adamw:
+    type: AdamW
+    lr: 0.001
+    betas: [0.9, 0.999]
+
+  muon:
+    type: Muon
+    lr: 0.001
+    momentum: 0.95
+    use_nesterov: true
+
+# ==============================================================================
+# Input Types
+# ==============================================================================
+
+input_types:
+  discrete:
+    description: "Discrete token indices with learned embeddings"
+    
+  onehot:
+    description: "One-hot encoded continuous vectors"
+    dimension: 194
+
+# ==============================================================================
+# Weight Decays
+# ==============================================================================
+
+weight_decays:
+  - 0
+  - 0.0001
+  - 0.001
+  - 0.01
+  - 0.1
+  - 1.0
+
+# ==============================================================================
+# Training Configuration
+# ==============================================================================
+
+training:
+  n_epochs: 50000
+  batch_size: full
+  lr: 0.001
+  device: cuda
+  seed: 42
+  log_freq: 100
+
+# ==============================================================================
+# AGOP Tracking Configuration
+# ==============================================================================
+
+agop:
+  enabled: true
+  freq: 100
+  top_k: 20
+  subsample: null
+  
+  metrics_tracked:
+    scalars:
+      - agop_variation_collapse_ratio
+      - agop_trace
+      - agop_eigengap
+      - agop_spectral_radius
+      - agop_frobenius
+      - agop_top5_energy_ratio
+      - agop_top10_energy_ratio
+      - agop_topk_subspace_similarity
+      
+    eigenvalues:
+      count: 20
+      format: "agop_eigenvalue_1 through agop_eigenvalue_20"
+      
+    eigenvectors:
+      count: 20
+      format: "agop_eigenvector_1 through agop_eigenvector_20"
+      storage: "2D array (n_epochs, d_input) in HDF5"
+
+# ==============================================================================
+# Output Structure
+# ==============================================================================
+
+output:
+  naming_convention: "results_{operation}_{split_percent}/"
+  
+  examples:
+    - "results_add_50/transformer_discrete_adamw/wd0.01_seed42/"
+    - "results_pure_cubic_80/mlp_onehot_muon/wd0.001_seed42/"
+  
+  files_per_experiment:
+    - config.json
+    - training_history.json
+    - agop_metrics.h5
+
+# ==============================================================================
+# Experiment Matrix Summary
+# ==============================================================================
+
+experiment_matrix:
+  operations: 9
+  splits: 2
+  architectures: 2
+  optimizers: 2
+  input_types: 2
+  weight_decays: 6
+  
+  total_experiments: 864
+  
+  slurm_scripts:
+    - run_all_operations_50_50.sh
+    - run_all_operations_80_20.sh
+
+# ==============================================================================
+# Research Questions
+# ==============================================================================
+
+research_questions:
+  - "Does VCR spike reliably predict grokking across different operations?"
+  - "How does train/test split ratio affect grokking dynamics?"
+  - "Which operations exhibit grokking and which do not?"
+  - "How do AGOP eigenvalue/eigenvector trajectories differ between grokking and non-grokking runs?"
+  - "Is there a relationship between operation complexity and VCR behavior?"

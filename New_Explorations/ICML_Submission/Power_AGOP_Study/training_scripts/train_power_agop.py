@@ -175,10 +175,19 @@ def train_with_agop_tracking(
     if agop_keys:
         with h5py.File(save_dir / 'agop_metrics.h5', 'w') as f:
             for key in agop_keys:
-                f.create_dataset(key, data=np.array(history[key]), compression='gzip')
+                data = history[key]
+                # Eigenvectors are stored as lists of lists, need special handling
+                if 'eigenvector' in key:
+                    # Convert list of lists to 2D numpy array (n_epochs, d_input)
+                    f.create_dataset(key, data=np.array(data), compression='gzip')
+                else:
+                    f.create_dataset(key, data=np.array(data), compression='gzip')
             # Store epochs at which AGOP was computed
             agop_epochs = [e for e in history['epoch'] if e % agop_freq == 0]
-            f.create_dataset('epoch', data=np.array(agop_epochs[:len(history[agop_keys[0]])]), compression='gzip')
+            # Find a non-eigenvector key to get the count
+            scalar_keys = [k for k in agop_keys if 'eigenvector' not in k]
+            if scalar_keys:
+                f.create_dataset('epoch', data=np.array(agop_epochs[:len(history[scalar_keys[0]])]), compression='gzip')
     
     print(f"Results saved to {save_dir}")
     return history
@@ -215,8 +224,8 @@ def main():
     parser.add_argument('--modulus', '-p', type=int, default=97,
                        help='Modulus for modular arithmetic')
     parser.add_argument('--operation', type=str, default='add',
-                       choices=['add', 'sub', 'mul', 'div', 'cubic', 'quadratic', 'symmetric_cubic', 'mixed_poly'],
-                       help='Modular operation: add (x+y), sub (x-y), mul (x*y), div (x/y), cubic (x^3+xy), quadratic (a^2+b), symmetric_cubic (a^3+b^3), mixed_poly (a^2+ab+b^2)')
+                       choices=['add', 'sub', 'mul', 'div', 'cubic', 'quadratic', 'symmetric_cubic', 'mixed_poly', 'pure_cubic', 'pure_mul'],
+                       help='Modular operation: add (x+y), sub (x-y), mul (x*y), div (x/y), cubic (x^3+xy), quadratic (a^2+b), symmetric_cubic (a^3+b^3), mixed_poly (a^2+ab+b^2), pure_cubic (x^3), pure_mul (x*y)')
     parser.add_argument('--train_fraction', type=float, default=0.5, 
                        help='Fraction of data for training (0.5 means 50 percent)')
     
@@ -293,6 +302,8 @@ def main():
         'quadratic': 'a² + b',
         'symmetric_cubic': 'a³ + b³',
         'mixed_poly': 'a² + ab + b²',
+        'pure_cubic': 'x³',
+        'pure_mul': 'x * y',
     }
     op_desc = op_descriptions.get(args.operation, args.operation)
     
